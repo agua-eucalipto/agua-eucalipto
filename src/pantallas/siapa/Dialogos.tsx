@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import type { Canal, CodigoError, FolioVista } from "../../api";
 import { Aviso, Boton, CampoGrande, Casilla, Dialogo } from "../../componentes";
 import { VIGENCIA_MAXIMA_FOLIO_MS } from "../../dominio";
@@ -15,26 +15,52 @@ interface Cierre {
   onHecho: (mensaje: string) => void;
 }
 
-/** Registrar un folio nuevo, o reemplazar uno (desde su tarjeta o por tope). */
-export function DialogoRegistro({
+/**
+ * Registrar un folio nuevo, o reemplazar uno (desde su tarjeta o por tope).
+ *
+ * Cada diálogo guarda su estado en un cuerpo propio y deja `Dialogo` con
+ * propiedades fijas: así `Dialogo` no se vuelve a pintar mientras se escribe
+ * o se espera a la `Api`.
+ */
+export function DialogoRegistro(p: Cierre & { reemplaza?: FolioVista }) {
+  return (
+    <Dialogo titulo={siapa.registro.titulo} onCerrar={p.onCerrar}>
+      <CuerpoRegistro {...p} />
+    </Dialogo>
+  );
+}
+
+function CuerpoRegistro({
   reemplaza,
   onCerrar,
   onHecho,
 }: Cierre & { reemplaza?: FolioVista }) {
   const [codigo, setCodigo] = useState("");
   const [error, setError] = useState("");
-  const [ocupado, setOcupado] = useState(false);
+  const ocupado = useRef(false);
   const [candidatos, setCandidatos] = useState<FolioVista[] | null>(null);
   const [canalLleno, setCanalLleno] = useState<Canal | null>(null);
   const [elegido, setElegido] = useState<FolioVista | null>(null);
+
+  const formulario = useRef<HTMLFormElement>(null);
+
+  // Al elegir cuál reemplazar desaparece el botón tocado: el foco pasa a la
+  // acción principal, como hace `Dialogo` al abrirse.
+  useEffect(() => {
+    if (elegido) {
+      formulario.current
+        ?.querySelector<HTMLElement>("[data-foco-inicial]")
+        ?.focus();
+    }
+  }, [elegido]);
 
   const destino = reemplaza ?? elegido;
   const canal = canalEscrito(codigo);
 
   const enviar = async (e?: Event) => {
     e?.preventDefault();
-    if (ocupado) return;
-    setOcupado(true);
+    if (ocupado.current) return;
+    ocupado.current = true;
     setError("");
     try {
       const r = await api.registrar_folio(codigo, destino?.id);
@@ -65,85 +91,84 @@ export function DialogoRegistro({
     } catch {
       setError(siapa.fallo);
     } finally {
-      setOcupado(false);
+      ocupado.current = false;
     }
   };
 
   const eligiendo = candidatos !== null && canalLleno !== null && !elegido;
 
   return (
-    <Dialogo
-      titulo={eligiendo ? siapa.eligeReemplazo.titulo : siapa.registro.titulo}
-      onCerrar={onCerrar}
-    >
-      <form class="dialogo__cuerpo" onSubmit={enviar} noValidate>
-        <CampoGrande
-          id="folio-nuevo"
-          etiqueta={siapa.registro.etiqueta}
-          ayuda={siapa.registro.ayuda}
-          valor={codigo}
-          onInput={(v) => {
-            setCodigo(v);
-            setError("");
-          }}
-          error={error}
-          confirmacion={
-            canal ? siapa.registro.canalDetectado(canal) : undefined
-          }
-          autoCapitalize="characters"
-          deshabilitado={eligiendo || elegido !== null}
-        />
-        {eligiendo && canalLleno ? (
-          <>
-            <Aviso tono="atencion">
-              {siapa.eligeReemplazo.descripcion(canalLleno)}
-            </Aviso>
-            {candidatos.map((f) => (
-              <Boton
-                key={f.id}
-                ancho
-                onClick={() => setElegido(f)}
-                aria-label={siapa.eligeReemplazo.opcion(f.codigo)}
-              >
-                {siapa.eligeReemplazo.opcion(f.codigo)}
-              </Boton>
-            ))}
-          </>
-        ) : destino ? (
-          <>
-            <Aviso tono="atencion">
-              {siapa.reemplazo.aviso(destino.codigo)}
-            </Aviso>
+    <form ref={formulario} class="dialogo__cuerpo" onSubmit={enviar} noValidate>
+      <CampoGrande
+        id="folio-nuevo"
+        etiqueta={siapa.registro.etiqueta}
+        ayuda={siapa.registro.ayuda}
+        valor={codigo}
+        onInput={(v) => {
+          setCodigo(v);
+          setError("");
+        }}
+        error={error}
+        confirmacion={canal ? siapa.registro.canalDetectado(canal) : undefined}
+        autoCapitalize="characters"
+        deshabilitado={eligiendo || elegido !== null}
+      />
+      {eligiendo && canalLleno ? (
+        <>
+          <Aviso tono="atencion">
+            {siapa.eligeReemplazo.descripcion(canalLleno)}
+          </Aviso>
+          {candidatos.map((f) => (
             <Boton
-              variante="primario"
+              key={f.id}
               ancho
-              type="submit"
-              focoInicial={elegido !== null}
-              deshabilitado={ocupado}
+              onClick={() => setElegido(f)}
+              aria-label={siapa.eligeReemplazo.opcion(f.codigo)}
             >
-              {siapa.reemplazo.confirmar}
+              {siapa.eligeReemplazo.opcion(f.codigo)}
             </Boton>
-          </>
-        ) : (
+          ))}
+        </>
+      ) : destino ? (
+        <>
+          <Aviso tono="atencion">{siapa.reemplazo.aviso(destino.codigo)}</Aviso>
           <Boton
             variante="primario"
             ancho
             type="submit"
-            deshabilitado={ocupado}
+            focoInicial={elegido !== null}
           >
-            {siapa.registro.confirmar}
+            {siapa.reemplazo.confirmar}
           </Boton>
-        )}
-        <Boton variante="texto" ancho onClick={onCerrar}>
-          {siapa.registro.regresar}
+        </>
+      ) : (
+        <Boton variante="primario" ancho type="submit">
+          {siapa.registro.confirmar}
         </Boton>
-      </form>
-    </Dialogo>
+      )}
+      <Boton variante="texto" ancho onClick={onCerrar}>
+        {siapa.registro.regresar}
+      </Boton>
+    </form>
   );
 }
 
 /** "Me surtieron": casilla marcada por omisión para quitar los demás activos. */
-export function DialogoSurtido({
+export function DialogoSurtido(
+  p: Cierre & { folio: FolioVista; otrosActivos: number },
+) {
+  return (
+    <Dialogo
+      titulo={siapa.surtieron.titulo}
+      descripcion={`${p.folio.codigo}. ${siapa.surtieron.descripcion}`}
+      onCerrar={p.onCerrar}
+    >
+      <CuerpoSurtido {...p} />
+    </Dialogo>
+  );
+}
+
+function CuerpoSurtido({
   folio,
   otrosActivos,
   onCerrar,
@@ -151,11 +176,11 @@ export function DialogoSurtido({
 }: Cierre & { folio: FolioVista; otrosActivos: number }) {
   const [quemar, setQuemar] = useState(true);
   const [error, setError] = useState("");
-  const [ocupado, setOcupado] = useState(false);
+  const ocupado = useRef(false);
 
   const confirmar = async () => {
-    if (ocupado) return;
-    setOcupado(true);
+    if (ocupado.current) return;
+    ocupado.current = true;
     setError("");
     try {
       const r = await api.marcar_surtido(folio.id, quemar);
@@ -164,50 +189,53 @@ export function DialogoSurtido({
     } catch {
       setError(siapa.fallo);
     } finally {
-      setOcupado(false);
+      ocupado.current = false;
     }
   };
 
   return (
-    <Dialogo
-      titulo={siapa.surtieron.titulo}
-      descripcion={`${folio.codigo}. ${siapa.surtieron.descripcion}`}
-      onCerrar={onCerrar}
-    >
+    <>
       {otrosActivos > 0 ? (
         <Casilla id="quemar-otros" marcada={quemar} onCambio={setQuemar}>
           {siapa.surtieron.quemarOtros(otrosActivos)}
         </Casilla>
       ) : null}
       {error ? <Aviso tono="error">{error}</Aviso> : null}
-      <Boton
-        variante="primario"
-        ancho
-        focoInicial
-        deshabilitado={ocupado}
-        onClick={confirmar}
-      >
+      <Boton variante="primario" ancho focoInicial onClick={confirmar}>
         {siapa.surtieron.confirmar}
       </Boton>
       <Boton variante="texto" ancho onClick={onCerrar}>
         {siapa.registro.regresar}
       </Boton>
-    </Dialogo>
+    </>
   );
 }
 
 /** "Sigue pendiente": explica que es una sola vez y hasta cuándo queda. */
-export function DialogoPendiente({
+export function DialogoPendiente(p: Cierre & { folio: FolioVista }) {
+  const hasta = fechaCorta(p.folio.registrado_at + VIGENCIA_MAXIMA_FOLIO_MS);
+  return (
+    <Dialogo
+      titulo={siapa.pendiente.titulo}
+      descripcion={`${p.folio.codigo}. ${siapa.pendiente.descripcion(hasta)}`}
+      onCerrar={p.onCerrar}
+    >
+      <CuerpoPendiente {...p} />
+    </Dialogo>
+  );
+}
+
+function CuerpoPendiente({
   folio,
   onCerrar,
   onHecho,
 }: Cierre & { folio: FolioVista }) {
   const [error, setError] = useState("");
-  const [ocupado, setOcupado] = useState(false);
+  const ocupado = useRef(false);
 
   const confirmar = async () => {
-    if (ocupado) return;
-    setOcupado(true);
+    if (ocupado.current) return;
+    ocupado.current = true;
     setError("");
     try {
       const r = await api.marcar_sigue_pendiente(folio.id);
@@ -216,31 +244,19 @@ export function DialogoPendiente({
     } catch {
       setError(siapa.fallo);
     } finally {
-      setOcupado(false);
+      ocupado.current = false;
     }
   };
 
-  const hasta = fechaCorta(folio.registrado_at + VIGENCIA_MAXIMA_FOLIO_MS);
-
   return (
-    <Dialogo
-      titulo={siapa.pendiente.titulo}
-      descripcion={`${folio.codigo}. ${siapa.pendiente.descripcion(hasta)}`}
-      onCerrar={onCerrar}
-    >
+    <>
       {error ? <Aviso tono="error">{error}</Aviso> : null}
-      <Boton
-        variante="primario"
-        ancho
-        focoInicial
-        deshabilitado={ocupado}
-        onClick={confirmar}
-      >
+      <Boton variante="primario" ancho focoInicial onClick={confirmar}>
         {siapa.pendiente.confirmar}
       </Boton>
       <Boton variante="texto" ancho onClick={onCerrar}>
         {siapa.registro.regresar}
       </Boton>
-    </Dialogo>
+    </>
   );
 }

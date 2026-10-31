@@ -43,13 +43,13 @@ export const siapa = {
     titulo: "Registrar folio",
     etiqueta: "Folio",
     ayuda: "Empieza con SIAPAZAP (WhatsApp) o con 1162 (teléfono).",
+    /** El campo agrega la palomita. */
     canalDetectado: (canal: Canal) =>
-      `${canal === "whatsapp" ? "WhatsApp" : "Teléfono"} ✓`,
+      canal === "whatsapp" ? "WhatsApp" : "Teléfono",
     confirmar: "Registrar",
     regresar: "No, regresar",
   },
   eligeReemplazo: {
-    titulo: "¿Cuál reemplaza este nuevo?",
     descripcion: (canal: Canal) =>
       `Ya tienes 2 folios de ${canal === "whatsapp" ? "WhatsApp" : "teléfono"} activos. ¿Cuál reemplaza este nuevo?`,
     opcion: (codigo: string) => `Reemplazar ${codigo}`,

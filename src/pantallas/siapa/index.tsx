@@ -149,6 +149,9 @@ export function PantallaSiapa() {
     };
   }, [ahora, casa, rol, version]);
 
+  // Un aviso de una acción anterior no sobrevive a un cambio de día o de sesión.
+  useEffect(() => setMensaje(""), [ahora, casa, rol]);
+
   const cerrar = () => setAbierto(null);
   const hecho = (texto: string) => {
     setAbierto(null);
@@ -167,7 +170,10 @@ export function PantallaSiapa() {
   return (
     <>
       {casa !== null && folios !== null ? (
-        <p class="titulo-pantalla__resumen">
+        <p
+          class="titulo-pantalla__resumen"
+          style={{ marginBlockStart: "calc(var(--e-4) * -1)" }}
+        >
           {siapa.resumen(casa, activos, topeTotal)}
         </p>
       ) : null}
@@ -182,7 +188,11 @@ export function PantallaSiapa() {
       >
         {siapa.registrar}
       </Boton>
-      <div role="status" aria-live="polite">
+      <div
+        role="status"
+        aria-live="polite"
+        class={mensaje ? undefined : "solo-lector"}
+      >
         {mensaje ? <Aviso>{mensaje}</Aviso> : null}
       </div>
 
