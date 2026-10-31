@@ -1,7 +1,7 @@
-import { ApiFalsa } from "../../src/api";
+import { ApiMemoria } from "../../src/api/memoria";
 import * as relojReal from "../../src/reloj";
 import type { Api, ApiDemo } from "../../src/api/contrato";
-import { COORDINADOR } from "./mundo";
+import { COORDINADOR, MUNDO } from "./mundo";
 
 /** Funciones opcionales que no toda implementación tiene. */
 export type Capacidad = "pin_verificado";
@@ -32,8 +32,11 @@ export const INICIO = Date.UTC(2026, 10, 2, 16, 0, 0);
  * con el `MUNDO` de `mundo.ts` y sin sesión.
  */
 export async function crearApi(): Promise<EntornoPrueba> {
-  const api: Api & ApiDemo = new ApiFalsa();
   relojReal.fijar(INICIO);
+  const api: Api & ApiDemo = new ApiMemoria({
+    catalogo: MUNDO,
+    almacenamiento: null,
+  });
   return {
     api,
     reloj: {
@@ -43,10 +46,12 @@ export async function crearApi(): Promise<EntornoPrueba> {
       },
     },
     entrarComo: async (quien) => {
-      if (quien === "coordinador") {
-        await api.demo_ver_como("coordinador", COORDINADOR.casa);
-      } else {
-        await api.demo_ver_como("vecino", quien);
+      const r =
+        quien === "coordinador"
+          ? await api.demo_ver_como("coordinador", COORDINADOR.casa)
+          : await api.demo_ver_como("vecino", quien);
+      if (!r.ok) {
+        throw new Error(`no se pudo entrar como ${quien}: ${r.error}`);
       }
     },
     capacidades: new Set<Capacidad>(),
