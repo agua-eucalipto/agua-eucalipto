@@ -65,6 +65,7 @@ export const info = {
     cargando: "Cargando…",
     sinSesion: "Entra a tu casa para ver la bitácora.",
     sistema: "El sistema",
+    alguien: "Alguien",
     casa: (n: string) => `Casa ${n}`,
     coordinacion: (n: string) => `Coordinación (casa ${n})`,
     hace: (texto: string) => `hace ${texto}`,

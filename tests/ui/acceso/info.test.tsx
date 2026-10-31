@@ -142,6 +142,10 @@ describe("AC-03 · la bitácora nunca muestra un folio completo ni un teléfono"
     expect(queHizo(evento)).toContain("SIAPAZAP••••1001");
     expect(queHizo(evento)).not.toContain("SIAPAZAP20261001");
     expect(quien(evento)).not.toContain("5500000007");
+    expect(quien({ ...evento, casa_numero: null })).toBe(t.bitacora.alguien);
+    expect(quien({ ...evento, rol: "sistema", casa_numero: null })).toBe(
+      t.bitacora.sistema,
+    );
   });
 
   it("todos los tipos de evento tienen texto propio y ninguno cae en el genérico", () => {

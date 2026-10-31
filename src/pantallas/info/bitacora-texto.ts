@@ -31,7 +31,8 @@ function canal(valor: unknown): string {
 
 /** Quién hizo el movimiento: «Casa 7», «Coordinación (casa 3)» o «El sistema». */
 export function quien(e: EventoVista): string {
-  if (e.rol === "sistema" || e.casa_numero === null) return b.sistema;
+  if (e.rol === "sistema") return b.sistema;
+  if (e.casa_numero === null) return b.alguien;
   const casa = proteger(e.casa_numero);
   return e.rol === "coordinador" ? b.coordinacion(casa) : b.casa(casa);
 }
