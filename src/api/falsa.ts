@@ -47,6 +47,7 @@ function folio(): FolioVista {
     vence_at: INSTANTE + 72 * HORA,
     dias_que_lleva: 0,
     puede_extender: true,
+    vence_hoy: false,
     ultimo_envio_caseta_at: null,
   };
 }

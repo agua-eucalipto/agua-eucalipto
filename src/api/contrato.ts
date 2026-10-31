@@ -169,6 +169,8 @@ export interface FolioVista {
   vence_at: number;
   dias_que_lleva: number;
   puede_extender: boolean;
+  /** Activo y con menos de 24 horas de vigencia restante. */
+  vence_hoy: boolean;
   /** Fecha del último envío a caseta en que apareció; `null` si nunca. */
   ultimo_envio_caseta_at: number | null;
 }
