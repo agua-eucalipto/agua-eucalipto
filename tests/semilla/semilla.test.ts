@@ -4,7 +4,7 @@ import type {
   PerfilDemo,
   ViajeVista,
 } from "../../src/api/contrato";
-import type { ApiMemoria } from "../../src/api/memoria";
+import { CLAVE_ESTADO, type ApiMemoria } from "../../src/api/memoria";
 import { crearApiDemo, sembrar } from "../../src/demo";
 import { HORA_MS } from "../../src/dominio";
 import { ahora, reiniciar } from "../../src/reloj";
@@ -337,7 +337,8 @@ describe("semilla", () => {
     const api = await nuevoDemo();
     await adelantar(api, 72);
     await como(api, "7");
-    await api.registrar_folio("116249999");
+    const registro = await api.registrar_folio("116249999");
+    expect(registro.ok).toBe(true);
     vi.setSystemTime(INICIO + 10 * 24 * HORA_MS);
     const r = await api.demo_reiniciar();
     expect(r.ok).toBe(true);
@@ -357,5 +358,14 @@ describe("semilla", () => {
     await primera.registrar_folio("116249998");
     const segunda = await crearApiDemo({ almacenamiento });
     expect((await foliosDe(segunda, "7")).has("116249998")).toBe(true);
+  });
+
+  it("siembra si lo guardado no es un estado válido", async () => {
+    const almacenamiento = {
+      getItem: (k: string) => (k === CLAVE_ESTADO ? "{no es json" : null),
+      setItem: () => undefined,
+    };
+    const api = await crearApiDemo({ almacenamiento });
+    expect((await foliosDe(api, "7")).size).toBe(5);
   });
 });

@@ -1,5 +1,5 @@
-import { ApiMemoria, CLAVE_ESTADO, type Almacen } from "../api/memoria";
-import { almacenDelNavegador } from "../api/memoria/persistencia";
+import { ApiMemoria, type Almacen } from "../api/memoria";
+import { almacenDelNavegador, leerEstado } from "../api/memoria/persistencia";
 import { sembrar } from "./semilla";
 
 export interface OpcionesApiDemo {
@@ -12,7 +12,7 @@ export interface OpcionesApiDemo {
 
 function hayEstadoGuardado(almacen: Almacen | null): boolean {
   try {
-    return almacen?.getItem(CLAVE_ESTADO) != null;
+    return almacen !== null && leerEstado(almacen) !== null;
   } catch {
     return false;
   }
