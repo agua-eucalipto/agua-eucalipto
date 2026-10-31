@@ -425,7 +425,7 @@ export interface Api {
 
   // Pipas
 
-  /** Viajes no cerrados y los terminados en los últimos 3 días. */
+  /** Viajes no cerrados y los terminados en los últimos 4 días. */
   listar_viajes(): Promise<Resultado<ViajeVista[]>>;
 
   listar_espera(): Promise<Resultado<EsperaVista[]>>;

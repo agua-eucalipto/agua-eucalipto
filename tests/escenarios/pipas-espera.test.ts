@@ -1,6 +1,7 @@
 import { expect } from "vitest";
 import { escenario } from "./escenario";
 import {
+  DIA,
   HORA,
   MIN,
   abrir,
@@ -106,6 +107,23 @@ escenario(
     expect((await espera(c, "16")).map((e) => e.casa_numero)).toEqual(["14"]);
     const otro = await abrir(c, "20");
     await anotar(c, "16", otro.id);
+  },
+);
+
+escenario(
+  "P-10 · un viaje que ya pasó sigue en la lista 4 días, con su sin confirmar a la vista",
+  async (c) => {
+    const { reloj } = c;
+    const v = await viajeQuePaso(c, "12", ["14", "16"]);
+
+    await reloj.adelantar(3 * DIA + HORA);
+    expect(anotacionDe(await ver(c, v.id, "20"), "16").sin_confirmar).toBe(
+      true,
+    );
+    await reloj.adelantar(DIA - HORA);
+    expect(await buscarViaje(c, v.id)).toBeDefined();
+    await reloj.adelantar(MIN);
+    expect(await buscarViaje(c, v.id)).toBeUndefined();
   },
 );
 
