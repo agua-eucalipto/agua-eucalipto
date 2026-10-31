@@ -1,0 +1,74 @@
+/* Agua Eucalipto · tokens de diseño. Valores finales de la pasada de UX/UI.
+   Modo claro. CSS propio, sin librerías de UI. */
+
+:root {
+  /* Tipografía */
+  --fuente:
+    "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
+  --t-chico: 1rem; /* 16 px · fechas absolutas, notas */
+  --t-base: 1.125rem; /* 18 px · cuerpo (DF-01) */
+  --t-medio: 1.25rem; /* 20 px · botones, campos, códigos */
+  --t-titulo-3: 1.5rem; /* 24 px · títulos de tarjeta */
+  --t-titulo-2: 1.75rem; /* 28 px · títulos de sección */
+  --t-titulo-1: 2rem; /* 32 px · título de pantalla */
+  --interlinea: 1.5;
+  --interlinea-titulo: 1.2;
+  --peso-normal: 400;
+  --peso-fuerte: 700;
+
+  /* Color · claro */
+  --papel: #f6f4ee;
+  --superficie: #ffffff;
+  --tinta: #1b2220;
+  --tinta-2: #4b5652;
+  --linea: #d9ddd6;
+  --borde-control: #6a746f;
+  --marca: #1e5b4b;
+  --marca-fuerte: #164638;
+  --marca-suave: #e2eee8;
+  --sobre-marca: #ffffff;
+  --agua: #1d4f8c;
+  --agua-suave: #e4edf8;
+  --aviso-fondo: #ffe8d5;
+  --aviso-tinta: #6a2c00;
+  --aviso-borde: #b14d00;
+  --error-fondo: #fbe9e6;
+  --error-tinta: #8f2a1e;
+  --gris-fondo: #ecebe6;
+  --gris-tinta: #4b5652;
+  --demo-fondo: #bfe9f2;
+  --demo-tinta: #073b4c;
+  --foco: #1f57c3;
+  --velo: rgb(27 34 32 / 0.55);
+
+  /* Espaciado (base 4) */
+  --e-1: 4px;
+  --e-2: 8px;
+  --e-3: 12px;
+  --e-4: 16px;
+  --e-5: 24px;
+  --e-6: 32px;
+  --e-7: 48px;
+  --e-8: 64px;
+
+  /* Radios */
+  --r-control: 10px;
+  --r-tarjeta: 14px;
+  --r-pastilla: 999px;
+
+  /* Tamaños táctiles */
+  --toque-min: 48px;
+  --toque-principal: 56px;
+  --pestanas-alto: 72px;
+
+  /* Sombra y movimiento */
+  --sombra-tarjeta:
+    0 1px 2px rgb(27 34 32 / 0.06), 0 2px 8px rgb(27 34 32 / 0.06);
+  --sombra-dialogo: 0 12px 40px rgb(27 34 32 / 0.25);
+  --curva-salida: cubic-bezier(0.23, 1, 0.32, 1);
+  --dur-rapida: 140ms;
+  --dur-media: 220ms;
+
+  --ancho-contenido: 760px;
+}
