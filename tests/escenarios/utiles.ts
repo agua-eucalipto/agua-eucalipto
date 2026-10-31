@@ -282,6 +282,7 @@ export async function conEventos(
   return eventosDespues(api, antes);
 }
 
+/** Tipos ordenados alfabéticamente, no por orden de ocurrencia. */
 export function tipos(eventos: EventoVista[]): string[] {
   return eventos.map((e) => e.tipo).sort();
 }

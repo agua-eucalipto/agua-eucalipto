@@ -246,7 +246,7 @@ escenario("G-INV-2 · una escritura exitosa deja sus eventos", async (c) => {
         await registrar(c, "7", wa(3), primero.id);
       }),
     ),
-  ).toEqual(["folio_registrado", "folio_reemplazado"]);
+  ).toEqual(["folio_reemplazado", "folio_registrado"]);
   await como("7");
   expect(
     tipos(
