@@ -162,7 +162,7 @@ export function BarraDemo() {
       </div>
       {confirmando ? (
         <Dialogo
-          titulo={demo.reiniciar}
+          titulo={demo.tituloReiniciar}
           descripcion={demo.confirmarReinicio}
           onCerrar={() => setConfirmando(false)}
         >

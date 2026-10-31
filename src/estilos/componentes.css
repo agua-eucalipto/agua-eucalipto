@@ -895,3 +895,16 @@ h1[tabindex="-1"]:focus {
     flex-wrap: nowrap;
   }
 }
+
+/* Campo deshabilitado: mismo gris que los botones deshabilitados */
+.campo__entrada:disabled {
+  background: var(--gris-fondo);
+  color: var(--gris-tinta);
+  border-color: var(--gris-fondo);
+  cursor: not-allowed;
+  -webkit-text-fill-color: var(--gris-tinta);
+}
+.campo:has(.campo__entrada:disabled) .campo__etiqueta,
+.campo:has(.campo__entrada:disabled) .campo__ayuda {
+  color: var(--gris-tinta);
+}

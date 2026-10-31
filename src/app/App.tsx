@@ -6,7 +6,7 @@ import { BarraDemo } from "./BarraDemo";
 import { Encabezado } from "./Encabezado";
 import { Navegacion } from "./Pestanas";
 import { iniciarNavegacion, rutaActual, type Ruta } from "./ruta";
-import { refrescarSesion, sesion, verComo } from "./servicios";
+import { arrancarSesionDemo, sesion } from "./servicios";
 
 const { comun } = textos;
 
@@ -27,18 +27,11 @@ const Sistema = import.meta.env.DEV ? lazy(() => import("./Sistema")) : null;
 
 function Pantalla() {
   const ruta = rutaActual.value;
-  if (ruta === "sistema" && Sistema) {
-    return (
-      <main class="contenido" id="contenido">
-        <TituloPantalla id="titulo-pantalla" titulo="Catálogo de componentes" />
-        <Suspense fallback={null}>
-          <Sistema />
-        </Suspense>
-      </main>
-    );
-  }
+  const enCatalogo = ruta === "sistema" && Sistema !== null;
   const info = ruta && ruta !== "sistema" ? PANTALLAS[ruta] : null;
-  const titulo = info?.titulo ?? comun.titulos.noEncontrada;
+  const titulo = enCatalogo
+    ? "Catálogo de componentes"
+    : (info?.titulo ?? comun.titulos.noEncontrada);
 
   useEffect(() => {
     document.title = `${titulo} · ${comun.marca.nombre}`;
@@ -46,6 +39,17 @@ function Pantalla() {
     h1?.focus({ preventScroll: true });
     window.scrollTo(0, 0);
   }, [ruta, titulo]);
+
+  if (enCatalogo && Sistema) {
+    return (
+      <main class="contenido" id="contenido">
+        <TituloPantalla id="titulo-pantalla" titulo={titulo} />
+        <Suspense fallback={null}>
+          <Sistema />
+        </Suspense>
+      </main>
+    );
+  }
 
   const sinPermiso =
     ruta === "coordinador" && sesion.value.rol !== "coordinador";
@@ -68,9 +72,7 @@ export function App() {
   useEffect(() => {
     const detener = iniciarNavegacion();
     void (async () => {
-      await refrescarSesion();
-      // Sin pantalla de acceso todavía: el demo arranca como vecino de la casa 7.
-      if (sesion.value.rol === "sin_sesion") await verComo("vecino", "7");
+      await arrancarSesionDemo();
     })();
     return detener;
   }, []);

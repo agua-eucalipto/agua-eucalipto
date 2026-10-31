@@ -9,8 +9,5 @@ const FECHA = new Intl.DateTimeFormat("es-MX", {
 
 /** "sáb 31 oct, 10:00" a partir de milisegundos desde epoch. */
 export function fechaCorta(ms: number): string {
-  return FECHA.format(new Date(ms))
-    .replace(/\./g, "")
-    .replace(" de ", " ")
-    .replace(",", ",");
+  return FECHA.format(new Date(ms)).replace(/\./g, "").replace(" de ", " ");
 }

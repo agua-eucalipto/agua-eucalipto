@@ -26,7 +26,7 @@ export const comun = {
     coordinador: "Aquí estará el panel de coordinación.",
     informacion:
       "Aquí estarán el resumen, las reglas, la bitácora y la privacidad.",
-    noEncontrada: "Usa las pestañas de abajo para volver.",
+    noEncontrada: "Usa las pestañas para volver.",
   },
   demo: {
     etiqueta: "DEMO",
@@ -40,8 +40,8 @@ export const comun = {
     casa: "Casa",
     adelantar: "Adelantar 1 día",
     reiniciar: "Reiniciar",
-    confirmarReinicio:
-      "¿Reiniciar el demo? Se borran los cambios y vuelven los datos de ejemplo.",
+    confirmarReinicio: "Se borran los cambios y vuelven los datos de ejemplo.",
+    tituloReiniciar: "¿Reiniciar el demo?",
     siReiniciar: "Sí, reiniciar",
     noRegresar: "No, regresar",
     dia: (n: number) => `Día +${n}`,

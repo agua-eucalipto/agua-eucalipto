@@ -38,6 +38,15 @@ export async function verComo(
   return r;
 }
 
+/**
+ * Sin pantalla de acceso todavía: si no hay sesión, el demo arranca como
+ * vecino de la casa 7.
+ */
+export async function arrancarSesionDemo(): Promise<void> {
+  await refrescarSesion();
+  if (sesion.value.rol === "sin_sesion") await verComo("vecino", "7");
+}
+
 export async function adelantarUnDia() {
   const r = await apiDemo.demo_adelantar_reloj(24);
   if (r.ok) {
@@ -49,7 +58,7 @@ export async function adelantarUnDia() {
 export async function reiniciarDemo() {
   const r = await apiDemo.demo_reiniciar();
   if (r.ok) {
-    await refrescarSesion();
+    await arrancarSesionDemo();
   }
   return r;
 }
