@@ -32,7 +32,8 @@ export function BarraDemo() {
   const [abierta, setAbierta] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
   const [aviso, setAviso] = useState("");
-  const [casa, setCasa] = useState("7");
+  /** La casa sale de la sesión; "7" solo es la sugerida al pasar a vecino. */
+  const casa = sesion.value.casa ?? "7";
   const dias = diasAdelantados();
   const perfil = perfilActual();
 
@@ -127,8 +128,7 @@ export function BarraDemo() {
                   value={casa}
                   onChange={(e) => {
                     const c = (e.currentTarget as HTMLSelectElement).value;
-                    setCasa(c);
-                    if (perfil === "vecino") void cambiarPerfil("vecino", c);
+                    void cambiarPerfil("vecino", c);
                   }}
                 >
                   {CATALOGO_DEMO.casas.map((c) => (
