@@ -1,0 +1,15 @@
+# Dependencias y build
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+.DS_Store
+
+# Variables locales
+.env
+.env.*
+!.env.example
+
+# Datos reales
+datos-reales/
