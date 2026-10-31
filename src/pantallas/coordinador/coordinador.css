@@ -14,8 +14,16 @@
 .coordinador-seccion {
   margin-top: 0;
 }
-.coordinador-telefono {
-  grid-template-columns: 1fr auto;
+.filas .coordinador-telefono {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 600px) {
+  .filas .coordinador-telefono {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+.coordinador-telefono .btn {
+  white-space: nowrap;
 }
 .coordinador-telefono__numero {
   white-space: nowrap;
@@ -29,6 +37,9 @@
   border-radius: var(--r-control);
   resize: vertical;
 }
+.caseta .tabla th[scope="rowgroup"] {
+  white-space: nowrap;
+}
 .solo-impresion {
   display: none;
 }
@@ -40,16 +51,19 @@
     display: none !important;
   }
 
-  .panel-coordinador {
+  .panel-coordinador.dos-columnas {
     display: block;
   }
 
-  .caseta {
+  .panel-coordinador .caseta {
     box-shadow: none;
     border: 0;
     padding: 0;
   }
 
+  .caseta .coordinador-subtitulo {
+    display: none;
+  }
   .solo-impresion {
     display: block;
     margin-bottom: 8pt;
@@ -69,10 +83,7 @@
   .caseta .tabla {
     width: 100%;
   }
-  .caseta .tabla th[scope="rowgroup"] {
-    white-space: nowrap;
-  }
-  .caseta__total {
+  .panel-coordinador .caseta__total {
     color: #000;
     font-size: 14pt;
     font-weight: 700;
