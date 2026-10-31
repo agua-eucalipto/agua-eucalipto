@@ -18,6 +18,8 @@ export const INACTIVIDAD_RESPONSABLE_MS = DIA_MS;
 export const CIERRE_VIAJE_MS = 3 * DIA_MS;
 /** Pasadas 72 horas de "Ya pasó", una casa sin confirmar queda "sin confirmar". */
 export const SIN_CONFIRMAR_MS = 3 * DIA_MS;
+/** Un viaje con "Ya pasó" sigue en la lista 4 días, para que se vea el "sin confirmar" del día 3. */
+export const VENTANA_VIAJES_TERMINADOS_MS = 4 * DIA_MS;
 
 export const PATRON_FOLIO_WHATSAPP = /^SIAPAZAP\d{4,}$/;
 export const PATRON_FOLIO_TELEFONO = /^1162\d{4,}$/;

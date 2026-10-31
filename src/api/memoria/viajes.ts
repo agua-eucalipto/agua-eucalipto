@@ -2,6 +2,7 @@ import {
   MINIMO_CASAS_POR_DEFECTO,
   MINIMO_CASAS_RANGO,
   SIN_CONFIRMAR_MS,
+  VENTANA_VIAJES_TERMINADOS_MS,
 } from "../../dominio";
 import type {
   CambiosViaje,
@@ -27,8 +28,6 @@ import {
 
 const LARGO_PROVEEDOR = { min: 1, max: 40 } as const;
 const LARGO_ETA = 60;
-/** Ventana en que un viaje terminado sigue en `listar_viajes`. */
-const VENTANA_TERMINADOS_MS = SIN_CONFIRMAR_MS;
 
 // ---------------------------------------------------------------------------
 // Ayudas
@@ -203,7 +202,7 @@ function textoProveedor(proveedor: unknown): string {
 // Lecturas
 // ---------------------------------------------------------------------------
 
-/** Viajes no cerrados; los que ya pasaron se quedan 3 días más. */
+/** Viajes no cerrados; los que ya pasaron se quedan 4 días más. */
 export function listarViajes(tx: Transaccion): Resultado<ViajeVista[]> {
   if (tx.casa() === null) {
     return falla("NO_AUTORIZADO");
@@ -211,7 +210,8 @@ export function listarViajes(tx: Transaccion): Resultado<ViajeVista[]> {
   const visibles = tx.estado.viajes.filter(
     (v) =>
       v.cerrado_sin_completar_at === null &&
-      (v.paso_at === null || tx.ahora - v.paso_at <= VENTANA_TERMINADOS_MS),
+      (v.paso_at === null ||
+        tx.ahora - v.paso_at <= VENTANA_VIAJES_TERMINADOS_MS),
   );
   return exito(
     [...visibles]
