@@ -1,0 +1,57 @@
+/* Impresión: hoja carta limpia, sin color, barra de demo ni navegación. */
+
+@page {
+  size: letter;
+  margin: 18mm;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 14pt;
+  }
+
+  .barra-demo,
+  .encabezado,
+  .pestanas,
+  .saltar,
+  .no-imprimir {
+    display: none !important;
+  }
+
+  #app {
+    min-height: 0;
+    display: block;
+  }
+
+  .contenido {
+    max-width: none;
+    padding: 0;
+  }
+
+  .tarjeta {
+    box-shadow: none;
+    border: 1px solid #000;
+    break-inside: avoid;
+  }
+
+  .tabla-envoltura {
+    border: 0;
+    overflow: visible;
+  }
+
+  .tabla,
+  .tabla th,
+  .tabla td {
+    border: 1px solid #000;
+    color: #000;
+    background: #fff;
+    font-size: 14pt;
+  }
+
+  .tabla tr {
+    break-inside: avoid;
+  }
+}
