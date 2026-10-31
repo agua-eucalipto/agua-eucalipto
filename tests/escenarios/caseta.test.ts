@@ -54,6 +54,7 @@ escenario(
     await registrar(c, "7", wa(1));
     await como("7");
     const antes = await instantanea(c, ["7"]);
+    await como("7");
     rechaza(
       await api.generar_lista_caseta(COMPLETA),
       "NO_AUTORIZADO",

@@ -141,7 +141,7 @@ escenario(
     const eventos = await conEventos(api, async () => {
       nuevo = ok(await api.registrar_folio(wa(3), w1.id), "reemplazar");
     });
-    expect(tipos(eventos)).toEqual(["folio_registrado", "folio_reemplazado"]);
+    expect(tipos(eventos)).toEqual(["folio_reemplazado", "folio_registrado"]);
     expect(nuevo.id, "el folio nuevo es otro").not.toBe(w1.id);
     expect(nuevo.estado).toBe("activo");
 
