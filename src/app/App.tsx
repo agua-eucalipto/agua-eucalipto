@@ -1,6 +1,12 @@
+import type { ComponentType } from "preact";
 import { lazy, Suspense } from "preact/compat";
 import { useEffect } from "preact/hooks";
 import { Aviso, PantallaVacia, TituloPantalla } from "../componentes";
+import { PrimeraVez } from "../pantallas/acceso";
+import { PantallaCoordinador } from "../pantallas/coordinador";
+import { PantallaInfo } from "../pantallas/info";
+import { PantallaPipas } from "../pantallas/pipas";
+import { PantallaSiapa } from "../pantallas/siapa";
 import { textos } from "../textos";
 import { BarraDemo } from "./BarraDemo";
 import { Encabezado } from "./Encabezado";
@@ -12,15 +18,15 @@ const { comun } = textos;
 
 const PANTALLAS: Record<
   Exclude<Ruta, "sistema">,
-  { titulo: string; vacia: string }
+  { titulo: string; Componente: ComponentType }
 > = {
-  siapa: { titulo: comun.titulos.siapa, vacia: comun.vacias.siapa },
-  pipas: { titulo: comun.titulos.pipas, vacia: comun.vacias.pipas },
+  siapa: { titulo: comun.titulos.siapa, Componente: PantallaSiapa },
+  pipas: { titulo: comun.titulos.pipas, Componente: PantallaPipas },
   coordinador: {
     titulo: comun.titulos.coordinador,
-    vacia: comun.vacias.coordinador,
+    Componente: PantallaCoordinador,
   },
-  info: { titulo: comun.titulos.informacion, vacia: comun.vacias.informacion },
+  info: { titulo: comun.titulos.informacion, Componente: PantallaInfo },
 };
 
 const Sistema = import.meta.env.DEV ? lazy(() => import("./Sistema")) : null;
@@ -59,10 +65,10 @@ function Pantalla() {
       <TituloPantalla id="titulo-pantalla" titulo={titulo} />
       {sinPermiso ? (
         <Aviso tono="atencion">{comun.noAutorizado}</Aviso>
+      ) : info ? (
+        <info.Componente />
       ) : (
-        <PantallaVacia>
-          {info?.vacia ?? comun.vacias.noEncontrada}
-        </PantallaVacia>
+        <PantallaVacia>{comun.vacias.noEncontrada}</PantallaVacia>
       )}
     </main>
   );
@@ -93,6 +99,7 @@ export function App() {
       <Encabezado />
       <Pantalla />
       <Navegacion variante="movil" />
+      <PrimeraVez />
     </>
   );
 }
