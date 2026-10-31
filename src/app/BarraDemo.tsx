@@ -70,12 +70,14 @@ export function BarraDemo() {
       aria-label={demo.region}
     >
       <div class="barra-demo__dentro">
-        <p class="barra-demo__marca">
-          <strong>{demo.etiqueta}</strong> · {demo.sufijo}
-        </p>
-        <p class="barra-demo__dia">
-          {demo.dia(dias)} · {fechaCorta(reloj.value)}
-        </p>
+        <div class="barra-demo__estado">
+          <p class="barra-demo__marca">
+            <strong>{demo.etiqueta}</strong> · {demo.sufijo}
+          </p>
+          <p class="barra-demo__dia">
+            {demo.dia(dias)} · {fechaCorta(reloj.value)}
+          </p>
+        </div>
         <button
           class="btn-demo barra-demo__plegada"
           type="button"
@@ -118,23 +120,25 @@ export function BarraDemo() {
                 {demo.otraCalle}
               </button>
             </div>
-            <label class="barra-demo__casa">
-              {demo.casa}
-              <select
-                value={casa}
-                onChange={(e) => {
-                  const c = (e.currentTarget as HTMLSelectElement).value;
-                  setCasa(c);
-                  if (perfil === "vecino") void cambiarPerfil("vecino", c);
-                }}
-              >
-                {CATALOGO_DEMO.casas.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {perfil === "vecino" ? (
+              <label class="barra-demo__casa">
+                {demo.casa}
+                <select
+                  value={casa}
+                  onChange={(e) => {
+                    const c = (e.currentTarget as HTMLSelectElement).value;
+                    setCasa(c);
+                    if (perfil === "vecino") void cambiarPerfil("vecino", c);
+                  }}
+                >
+                  {CATALOGO_DEMO.casas.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
           </div>
           <button class="btn-demo" type="button" onClick={adelantar}>
             {demo.adelantar}

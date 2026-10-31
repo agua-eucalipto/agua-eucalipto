@@ -744,18 +744,32 @@
   font-size: var(--t-chico);
   font-weight: var(--peso-fuerte);
 }
+.barra-demo__estado {
+  display: flex;
+  flex-direction: column;
+}
 @media (max-width: 959.98px) {
+  .barra-demo__dentro {
+    row-gap: var(--e-1);
+  }
+  .barra-demo__estado {
+    margin-right: auto;
+  }
   .barra-demo--abierta .barra-demo__controles {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     flex-basis: 100%;
-    flex-direction: column;
-    align-items: stretch;
     margin-left: 0;
     padding-bottom: var(--e-2);
+    max-height: calc(100dvh - var(--pestanas-alto) - 140px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .barra-demo--abierta .barra-demo__ver-como {
+    grid-column: 1 / -1;
   }
   .barra-demo--abierta .barra-demo__controles .btn-demo {
-    width: 100%;
-    justify-content: space-between;
+    justify-content: center;
   }
 }
 .barra-demo__ver-como {
@@ -849,4 +863,35 @@
 }
 .barra-demo {
   padding-top: env(safe-area-inset-top);
+}
+
+/* Marca: enlace sin subrayado ni azul de enlace */
+a.marca {
+  text-decoration: none;
+  color: inherit;
+  min-height: var(--toque-min);
+  justify-content: center;
+}
+@media (hover: hover) and (pointer: fine) {
+  .marca:hover .marca__nombre {
+    text-decoration: underline;
+  }
+}
+/* El título recibe el foco al cambiar de pantalla; no es un control, sin anillo */
+h1[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* Barra de demo en escritorio (después de las reglas base de sus piezas) */
+@media (min-width: 960px) {
+  .barra-demo__dentro {
+    flex-wrap: nowrap;
+  }
+  .barra-demo__ver-como {
+    flex-direction: row;
+    align-items: center;
+  }
+  .barra-demo__opciones {
+    flex-wrap: nowrap;
+  }
 }

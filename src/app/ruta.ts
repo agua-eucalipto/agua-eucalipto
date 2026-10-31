@@ -1,13 +1,15 @@
 import { signal } from "@preact/signals";
 
 export const RUTAS = ["siapa", "pipas", "coordinador", "info"] as const;
-export type Ruta = (typeof RUTAS)[number];
+/** `sistema` es el catálogo de componentes: solo existe con `npm run dev`. */
+export type Ruta = (typeof RUTAS)[number] | "sistema";
 export const RUTA_INICIAL: Ruta = "siapa";
 
 /** Lee la ruta de un hash tipo `#pipas`; `null` si no es una ruta conocida. */
 export function rutaDeHash(hash: string): Ruta | null {
   const limpio = hash.replace(/^#\/?/, "");
   if (limpio === "") return RUTA_INICIAL;
+  if (limpio === "sistema" && import.meta.env.DEV) return "sistema";
   return (RUTAS as readonly string[]).includes(limpio)
     ? (limpio as Ruta)
     : null;

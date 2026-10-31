@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "preact/compat";
 import { useEffect } from "preact/hooks";
 import { Aviso, PantallaVacia, TituloPantalla } from "../componentes";
 import { textos } from "../textos";
@@ -9,7 +10,10 @@ import { refrescarSesion, sesion, verComo } from "./servicios";
 
 const { comun } = textos;
 
-const PANTALLAS: Record<Ruta, { titulo: string; vacia: string }> = {
+const PANTALLAS: Record<
+  Exclude<Ruta, "sistema">,
+  { titulo: string; vacia: string }
+> = {
   siapa: { titulo: comun.titulos.siapa, vacia: comun.vacias.siapa },
   pipas: { titulo: comun.titulos.pipas, vacia: comun.vacias.pipas },
   coordinador: {
@@ -19,9 +23,21 @@ const PANTALLAS: Record<Ruta, { titulo: string; vacia: string }> = {
   info: { titulo: comun.titulos.informacion, vacia: comun.vacias.informacion },
 };
 
+const Sistema = import.meta.env.DEV ? lazy(() => import("./Sistema")) : null;
+
 function Pantalla() {
   const ruta = rutaActual.value;
-  const info = ruta ? PANTALLAS[ruta] : null;
+  if (ruta === "sistema" && Sistema) {
+    return (
+      <main class="contenido" id="contenido">
+        <TituloPantalla id="titulo-pantalla" titulo="Catálogo de componentes" />
+        <Suspense fallback={null}>
+          <Sistema />
+        </Suspense>
+      </main>
+    );
+  }
+  const info = ruta && ruta !== "sistema" ? PANTALLAS[ruta] : null;
   const titulo = info?.titulo ?? comun.titulos.noEncontrada;
 
   useEffect(() => {
