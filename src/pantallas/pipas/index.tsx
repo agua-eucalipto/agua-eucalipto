@@ -8,7 +8,7 @@ import { DetalleViaje } from "./DetalleViaje";
 import { DialogoPipas } from "./Dialogos";
 import { textoDeError } from "./errores";
 import { ListaEspera } from "./Espera";
-import { esActivo } from "./formato";
+import { DOS_COLUMNAS, esActivo } from "./formato";
 import {
   datosParaAbrir,
   FormularioViaje,
@@ -226,7 +226,6 @@ export function PantallaPipas() {
         tipo={dialogo.tipo}
         viaje={viajeDialogo}
         error={errorDialogo}
-        enviando={enviando}
         cerrar={cerrarDialogo}
         baja={() =>
           void desdeDialogo(
@@ -319,7 +318,7 @@ export function PantallaPipas() {
     cuerpo = (
       <>
         <MiSituacion datos={datos} ahora={ahora} acciones={acciones} />
-        <div class="dos-columnas">
+        <div class="dos-columnas" style={DOS_COLUMNAS}>
           <section class="seccion" aria-labelledby="h-viajes">
             <h2 id="h-viajes" tabIndex={-1}>
               {pipas.secciones.abiertos}

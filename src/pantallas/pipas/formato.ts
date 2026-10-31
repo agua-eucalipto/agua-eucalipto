@@ -70,3 +70,13 @@ export function lugarDe(v: ViajeVista, casa: string | null): number {
   const anotadas = v.anotaciones.filter((a) => a.estado === "anotada");
   return anotadas.findIndex((a) => a.casa_numero === casa) + 1;
 }
+
+/**
+ * En pantallas angostas `.dos-columnas` todavía no es una rejilla y las dos
+ * partes quedan pegadas. Esto les da separación; desde 960 px coincide con
+ * lo que ya define la hoja de estilos.
+ */
+export const DOS_COLUMNAS = {
+  display: "grid",
+  gap: "var(--e-5)",
+} as const;

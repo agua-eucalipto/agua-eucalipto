@@ -1,3 +1,4 @@
+import { memo } from "preact/compat";
 import { useState } from "preact/hooks";
 import type { ViajeVista } from "../../api";
 import { Aviso, Boton, CampoGrande, Casilla, Dialogo } from "../../componentes";
@@ -10,7 +11,6 @@ interface PropsDialogos {
   tipo: TipoDialogo;
   viaje: ViajeVista;
   error: string | null;
-  enviando: boolean;
   cerrar: () => void;
   baja: () => void;
   pedir: (eta: string) => void;
@@ -147,8 +147,7 @@ function ContenidoTomar({
   );
 }
 
-/** Los cinco diálogos de confirmación de la pantalla de pipas. */
-export function DialogoPipas(p: PropsDialogos) {
+function DialogoPipasInterno(p: PropsDialogos) {
   const d = pipas.dialogos;
   switch (p.tipo) {
     case "baja":
@@ -226,3 +225,21 @@ export function DialogoPipas(p: PropsDialogos) {
       );
   }
 }
+
+/**
+ * Los cinco diálogos de confirmación de la pantalla de pipas.
+ *
+ * Solo se vuelve a pintar si cambia el diálogo, su viaje o su error. El
+ * componente `Dialogo` pinta su contenido en otra raíz desde un efecto, y si
+ * se re-renderiza dos veces antes de que ese efecto corra, preact/debug avisa
+ * de «hook fuera de render». Las acciones no dependen de las props viejas
+ * (solo usan el id del viaje y funciones estables), así que no hace falta.
+ */
+export const DialogoPipas = memo(
+  DialogoPipasInterno,
+  (a, b) =>
+    a.tipo === b.tipo &&
+    a.viaje.id === b.viaje.id &&
+    a.viaje.estado === b.viaje.estado &&
+    a.error === b.error,
+);

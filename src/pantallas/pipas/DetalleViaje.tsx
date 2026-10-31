@@ -9,7 +9,7 @@ import {
 } from "../../componentes";
 import { fechaCorta } from "../../app/formato";
 import { textos } from "../../textos";
-import { textoDeEstado, visualDeEstado } from "./formato";
+import { DOS_COLUMNAS, textoDeEstado, visualDeEstado } from "./formato";
 import { viajePorConfirmar } from "./MiSituacion";
 import { MarcasViaje } from "./TarjetaDeViaje";
 import type { AccionesPipas } from "./tipos";
@@ -146,16 +146,18 @@ export function DetalleViaje({
 
   return (
     <>
-      <Boton variante="texto" onClick={volver}>
-        <span aria-hidden="true">←</span> {pipas.viaje.volver}
-      </Boton>
+      <div>
+        <Boton variante="texto" onClick={volver}>
+          <span aria-hidden="true">←</span> {pipas.viaje.volver}
+        </Boton>
+      </div>
       <div class="titulo-pantalla">
         <h2 id="titulo-vista" tabIndex={-1}>
           {viaje.proveedor}
         </h2>
         <p class="titulo-pantalla__resumen">{resumen}</p>
       </div>
-      <div class="dos-columnas">
+      <div class="dos-columnas" style={DOS_COLUMNAS}>
         <Tarjeta etiqueta={pipas.secciones.estado}>
           <div>
             <Insignia

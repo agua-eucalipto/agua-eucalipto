@@ -66,9 +66,11 @@ export function FormularioViaje({
 
   return (
     <>
-      <Boton variante="texto" onClick={volver}>
-        <span aria-hidden="true">←</span> {pipas.formulario.volver}
-      </Boton>
+      <div>
+        <Boton variante="texto" onClick={volver}>
+          <span aria-hidden="true">←</span> {pipas.formulario.volver}
+        </Boton>
+      </div>
       <div class="titulo-pantalla">
         <h2 id="titulo-vista" tabIndex={-1}>
           {edita ? pipas.formulario.tituloEditar : pipas.formulario.tituloAbrir}

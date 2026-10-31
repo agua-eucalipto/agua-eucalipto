@@ -77,7 +77,7 @@ export const pipas = {
 
   casas: {
     orden:
-      "Primero las casas con prioridad, luego las que llevan más tiempo. Si no alcanza, se marcan las últimas.",
+      "Van primero las casas con prioridad y luego las que llevan más tiempo. Si no alcanza, se marcan las últimas.",
     casa: (n: string) => `Casa ${n}`,
     tuCasa: "Tu casa",
     coordina: "Coordina",
