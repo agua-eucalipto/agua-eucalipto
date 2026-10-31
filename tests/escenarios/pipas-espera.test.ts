@@ -286,6 +286,7 @@ escenario(
       await anotar(c, casa, d.id);
     }
     await pedir(c, "22", d.id);
+    expect(new Set([a.id, b.id, d.id]).size, "tres viajes distintos").toBe(3);
 
     await como("20");
     const eventos = await conEventos(api, async () => {
@@ -311,6 +312,8 @@ escenario(
     await reloj.adelantar(HORA);
     const otro = await abrir(c, "16", { minimo_casas: 6 });
     await anotar(c, "17", otro.id);
+    expect(otro.id, "dos viajes distintos").not.toBe(a.id);
+    expect(otro.abierto_at).toBeGreaterThan(a.abierto_at);
     await como("20");
     expect(ok(await api.anotarse_cualquiera(), "me da igual").viaje?.id).toBe(
       a.id,

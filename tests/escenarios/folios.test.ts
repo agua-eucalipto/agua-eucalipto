@@ -142,6 +142,7 @@ escenario(
       nuevo = ok(await api.registrar_folio(wa(3), w1.id), "reemplazar");
     });
     expect(tipos(eventos)).toEqual(["folio_registrado", "folio_reemplazado"]);
+    expect(nuevo.id, "el folio nuevo es otro").not.toBe(w1.id);
     expect(nuevo.estado).toBe("activo");
 
     const anterior = await folioDe(c, "7", w1.id);
@@ -330,6 +331,7 @@ escenario(
     await reloj.adelantar(HORA);
 
     const cambiados = ok(await api.marcar_surtido(a.id, true), "me surtieron");
+    expect(new Set([a.id, b.id, cc.id, z.id]).size, "folios distintos").toBe(4);
     expect(cambiados.map((f) => f.id).sort()).toEqual(
       [a.id, b.id, cc.id].sort(),
     );

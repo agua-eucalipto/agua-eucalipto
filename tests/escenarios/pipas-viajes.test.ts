@@ -337,7 +337,11 @@ escenario(
     await anotar(c, "16", v.id);
 
     await como("14");
-    const enLista = ok(await api.dar_de_baja(v.id), "baja en lista");
+    let enLista = v;
+    const eventosBaja = await conEventos(api, async () => {
+      enLista = ok(await api.dar_de_baja(v.id), "baja en lista");
+    });
+    expect(tipos(eventosBaja)).toContain("baja");
     expect(enLista).toMatchObject({ anotadas: 2, estoy_anotado: false });
     await anotar(c, "14", v.id);
 

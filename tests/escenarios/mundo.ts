@@ -7,6 +7,10 @@ import type { Api, ApiDemo } from "../../src/api/contrato";
  */
 export interface Mundo {
   calle: string;
+  /** Calles del coto: una casa de otra calle se rechaza (`CASA_OTRA_CALLE`). */
+  calles_del_coto: readonly string[];
+  /** Calles fuera del coto que se aceptan como solicitud de excepción. */
+  calles_de_excepcion: readonly string[];
   casas: readonly string[];
   /** Teléfonos de la lista blanca (10 dígitos). */
   lista_blanca: readonly string[];
@@ -15,6 +19,10 @@ export interface Mundo {
 }
 
 export const CALLE = "Eucalipto";
+/** Calle del coto distinta de Eucalipto: sin excepción se rechaza al instante. */
+export const CALLE_OTRA = "Ciruelo";
+/** Calle que se acepta como solicitud de excepción. */
+export const CALLE_EXCEPCION = "Naranjo";
 export const CASAS: readonly string[] = Array.from({ length: 25 }, (_, i) =>
   String(i + 1),
 );
@@ -32,6 +40,8 @@ export const TELEFONO_DESCONOCIDO = "5500000077";
 
 export const MUNDO: Mundo = {
   calle: CALLE,
+  calles_del_coto: [CALLE, CALLE_OTRA],
+  calles_de_excepcion: [CALLE_EXCEPCION],
   casas: CASAS,
   lista_blanca: CASAS.map(telefonoDe),
   coordinadores: [COORDINADOR.telefono],

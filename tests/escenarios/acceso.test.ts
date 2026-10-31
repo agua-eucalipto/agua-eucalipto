@@ -1,6 +1,8 @@
 import { expect } from "vitest";
 import { escenario } from "./escenario";
 import {
+  CALLE_EXCEPCION,
+  CALLE_OTRA,
   COORDINADOR,
   PIN,
   TELEFONO_DESCONOCIDO,
@@ -102,7 +104,7 @@ escenario(
     const porCasa = ok(
       await api.solicitar_acceso(
         telefonoDe("8"),
-        "Naranjo 8",
+        `${CALLE_EXCEPCION} 8`,
         "casa_fuera_de_catalogo",
       ),
       "casa fuera de catálogo",
@@ -112,7 +114,11 @@ escenario(
       motivo: "casa_fuera_de_catalogo",
     });
     rechaza(
-      await api.solicitar_acceso("123", "Naranjo 8", "casa_fuera_de_catalogo"),
+      await api.solicitar_acceso(
+        "123",
+        `${CALLE_EXCEPCION} 8`,
+        "casa_fuera_de_catalogo",
+      ),
       "TELEFONO_INVALIDO",
       "teléfono inválido",
     );
@@ -170,11 +176,11 @@ escenario(
     rechaza(
       await api.solicitar_acceso(
         TELEFONO_FUERA_DE_LISTA,
-        "Ciruelo 5",
+        `${CALLE_OTRA} 5`,
         "casa_fuera_de_catalogo",
       ),
       "CASA_OTRA_CALLE",
-      "casa de Ciruelo",
+      `casa de ${CALLE_OTRA}`,
     );
     await como("coordinador");
     expect(ok(await api.listar_solicitudes(), "listar")).toEqual([]);

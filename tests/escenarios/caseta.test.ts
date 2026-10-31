@@ -9,7 +9,6 @@ import {
   foliosDe,
   instantanea,
   ok,
-  ordenadas,
   rechaza,
   registrar,
   tel,
@@ -184,10 +183,14 @@ escenario(
 
     const antes = await foliosDe(c, "7");
     await como("coordinador");
-    let primera = ok(await api.generar_lista_caseta(COMPLETA), "primera");
+    const inicial = ok(await api.generar_lista_caseta(COMPLETA), "primera");
+    let segunda = inicial;
     const eventos = await conEventos(api, async () => {
-      primera = ok(await api.generar_lista_caseta(COMPLETA), "segunda");
+      segunda = ok(await api.generar_lista_caseta(COMPLETA), "segunda");
     });
+    expect(segunda.envio_id, "cada lista es un envío distinto").not.toBe(
+      inicial.envio_id,
+    );
     expect(tipos(eventos)).toEqual(["lista_caseta_generada"]);
 
     const despues = await foliosDe(c, "7");
@@ -197,13 +200,13 @@ escenario(
     ).toEqual(antes.map((f) => ({ ...f, ultimo_envio_caseta_at: null })));
     expect(
       despues.find((f) => f.id === enLista.id)?.ultimo_envio_caseta_at,
-    ).toBe(primera.generada_at);
+    ).toBe(segunda.generada_at);
     expect((await foliosDe(c, "8"))[0]?.ultimo_envio_caseta_at).toBeNull();
 
     await reloj.adelantar(HORA);
     await como("coordinador");
     const tercera = ok(await api.generar_lista_caseta(COMPLETA), "tercera");
-    expect(tercera.envio_id).not.toBe(primera.envio_id);
+    expect(tercera.envio_id).not.toBe(segunda.envio_id);
     expect((await foliosDe(c, "7"))[0]?.ultimo_envio_caseta_at).toBe(
       tercera.generada_at,
     );
@@ -212,6 +215,5 @@ escenario(
         (e) => e.tipo === "lista_caseta_generada",
       ),
     ).toHaveLength(3);
-    expect(ordenadas(["10", "2"])).toEqual(["2", "10"]);
   },
 );

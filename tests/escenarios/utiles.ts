@@ -315,9 +315,20 @@ export async function instantanea(contexto: Contexto, casas: string[]) {
 const CLAVES_DE_TELEFONO =
   /^(?:telefono|numero_telefono|registrado_por|resuelta_por|creado_por|pin|pin_hash)$/;
 
-/** Rutas donde la respuesta parece llevar un teléfono (valor o nombre de campo). */
+const ES_UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const CLAVE_DE_ID = /^(?:id|.+_id)$/;
+
+/**
+ * Rutas donde la respuesta parece llevar un teléfono (valor o nombre de campo).
+ * Los identificadores (claves `id` y `*_id`, y cadenas con forma de uuid) se
+ * ignoran: un uuid puede traer 10 dígitos seguidos sin ser un teléfono.
+ */
 export function buscarTelefonos(valor: unknown, ruta = "$"): string[] {
   if (typeof valor === "string") {
+    if (ES_UUID.test(valor)) {
+      return [];
+    }
     return /\d{10}/.test(valor) ? [`${ruta} = "${valor}"`] : [];
   }
   if (typeof valor === "number") {
@@ -331,7 +342,9 @@ export function buscarTelefonos(valor: unknown, ruta = "$"): string[] {
   if (valor !== null && typeof valor === "object") {
     return Object.entries(valor).flatMap(([clave, v]) => [
       ...(CLAVES_DE_TELEFONO.test(clave) ? [`${ruta}.${clave} (campo)`] : []),
-      ...buscarTelefonos(v, `${ruta}.${clave}`),
+      ...(CLAVE_DE_ID.test(clave)
+        ? []
+        : buscarTelefonos(v, `${ruta}.${clave}`)),
     ]);
   }
   return [];

@@ -1,7 +1,12 @@
 import { expect } from "vitest";
 import type { Api } from "../../src/api/contrato";
 import { escenario } from "./escenario";
-import { METODOS_API, METODOS_DEMO, telefonoDe } from "./mundo";
+import {
+  CALLE_EXCEPCION,
+  METODOS_API,
+  METODOS_DEMO,
+  telefonoDe,
+} from "./mundo";
 import {
   HORA,
   MIN,
@@ -419,6 +424,21 @@ escenario(
   "G-INV-5 · ninguna respuesta a un vecino contiene teléfonos",
   async (c) => {
     const { api, como } = c;
+    // Controles del detector: un uuid con 10 dígitos no es un teléfono; uno de verdad sí.
+    const uuidConDiez = "123e4567-e89b-12d3-a456-446655440000";
+    expect(
+      buscarTelefonos({
+        id: uuidConDiez,
+        viaje_id: "1234567890",
+        otro: uuidConDiez,
+      }),
+      "los identificadores no se marcan",
+    ).toEqual([]);
+    expect(
+      buscarTelefonos({ detalle: { texto: telefonoDe("7") } }),
+    ).toHaveLength(1);
+    expect(buscarTelefonos({ telefono: null })).toHaveLength(1);
+
     const respuestas: [string, unknown][] = [];
     const guardar = (que: string, r: unknown) => respuestas.push([que, r]);
 
@@ -426,7 +446,7 @@ escenario(
       "solicitar_acceso",
       await api.solicitar_acceso(
         telefonoDe("9"),
-        "Naranjo 8",
+        `${CALLE_EXCEPCION} 8`,
         "casa_fuera_de_catalogo",
       ),
     );
