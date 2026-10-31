@@ -1,16 +1,21 @@
 import { signal } from "@preact/signals";
-import { ApiMemoria } from "../api/memoria";
 import type { Api, ApiDemo, Sesion } from "../api";
+import { crearApiDemo } from "../demo";
 import { ahora } from "../reloj";
 
 /**
- * Punto de conexión con el adaptador. La semilla de datos de ejemplo la aporta
- * la sesión de `src/demo` (opción `semilla` de `ApiMemoria`); aquí se enchufa.
+ * Punto de conexión con el adaptador: la `Api` del demo, con los datos de
+ * ejemplo cargados la primera vez. Se asigna en `iniciarApi()`, antes de pintar.
  */
-const instancia = new ApiMemoria();
+export let api: Api;
+export let apiDemo: ApiDemo;
 
-export const api: Api = instancia;
-export const apiDemo: ApiDemo = instancia;
+export async function iniciarApi(): Promise<void> {
+  const instancia = await crearApiDemo();
+  api = instancia;
+  apiDemo = instancia;
+  reloj.value = ahora();
+}
 
 export const sesion = signal<Sesion>({ casa: null, rol: "sin_sesion" });
 /** Milisegundos del reloj simulado; cambia al adelantar o reiniciar. */

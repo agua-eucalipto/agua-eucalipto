@@ -267,7 +267,11 @@ describe("semilla", () => {
     const api = await nuevoDemo();
     await adelantar(api, 48);
     const v = await viajes(api);
-    expect([...v.keys()]).toEqual(["Rubén 1"]);
+    expect([...v.keys()]).toEqual(["Rubén 2", "Rubén 1"]);
+    expect(
+      v.get("Rubén 2")?.anotaciones.find((a) => a.casa_numero === "9")
+        ?.sin_confirmar,
+    ).toBe(true);
     const e = await espera(api);
     const casas = e.map((x) => x.casa_numero);
     expect(casas.slice(0, 2)).toEqual(["4", "13"]);
