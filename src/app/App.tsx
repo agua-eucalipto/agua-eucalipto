@@ -66,7 +66,7 @@ function Pantalla() {
       <TituloPantalla
         id="titulo-pantalla"
         titulo={titulo}
-        resumen={sinPermiso ? undefined : resumenTitulo.value}
+        resumen={ruta === "siapa" ? resumenTitulo.value : undefined}
       />
       {sinPermiso ? (
         <Aviso tono="atencion">{comun.noAutorizado}</Aviso>
