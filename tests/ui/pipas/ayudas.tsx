@@ -1,6 +1,7 @@
 import { act, cleanup, render, screen, within } from "@testing-library/preact";
 import { afterEach, beforeEach } from "vitest";
 import { PantallaPipas } from "../../../src/pantallas/pipas";
+import { iniciarNavegacion } from "../../../src/app/ruta";
 import * as servicios from "../../../src/app/servicios";
 
 /**
@@ -8,7 +9,10 @@ import * as servicios from "../../../src/app/servicios";
  * el reloj real. `localStorage` se limpia para que no se herede nada.
  */
 export function prepararDemo() {
+  let detener = () => {};
   beforeEach(async () => {
+    window.location.hash = "#pipas";
+    detener = iniciarNavegacion();
     localStorage.clear();
     await servicios.iniciarApi();
     await servicios.apiDemo.demo_reiniciar();
@@ -16,6 +20,7 @@ export function prepararDemo() {
   });
   afterEach(() => {
     cleanup();
+    detener();
     localStorage.clear();
   });
 }

@@ -135,6 +135,8 @@ export const pipas = {
   disclaimerResponsable: {
     texto:
       "Gracias por abrir este viaje. Quien lo abre ayuda a coordinarlo: llamar al pipero, avisar cuándo viene y marcar cuando ya pasó. Si pasan 24 horas sin movimiento, otro vecino anotado podrá tomar tu lugar.",
+    textoTomar:
+      "Quien coordina el viaje ayuda a llamar al pipero, avisar cuándo viene y marcar cuando ya pasó. Si pasan 24 horas sin movimiento, otro vecino anotado podrá tomar tu lugar.",
     casilla: "Lo entiendo y estoy de acuerdo",
   },
 

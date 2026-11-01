@@ -64,8 +64,10 @@ describe("Abrir un viaje (E-P02)", () => {
     fireEvent.click(screen.getByLabelText("Lo entiendo y estoy de acuerdo"));
     fireEvent.click(screen.getByRole("button", { name: "Abrir el viaje" }));
     await screen.findByText(/Se sumó 1 casa que estaba en espera/);
-    expect(screen.getByRole("heading", { name: "Rubén 3" })).toBeTruthy();
-    expect(screen.getByText("$140 por casa")).toBeTruthy();
+    expect(
+      await screen.findByRole("heading", { name: "Rubén 3" }),
+    ).toBeTruthy();
+    expect(await screen.findByText("$140 por casa")).toBeTruthy();
     const fila4 = screen.getByText("Casa 4").closest("li")!;
     expect(within(fila4).getByText("Con prioridad")).toBeTruthy();
     expect(
@@ -155,6 +157,12 @@ describe("Vista de responsable", () => {
       screen.getByRole("button", { name: "Ya llamé, viene en camino" }),
     );
     const dialogo = await screen.findByRole("dialog");
+    // El foco inicial cae en la primera hora, no en el botón aún deshabilitado.
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        within(dialogo).getByRole("button", { name: "~1 h" }),
+      ),
+    );
     const si = within(dialogo).getByRole("button", { name: "Sí, ya llamé" });
     expect(si.getAttribute("aria-disabled")).toBe("true");
     for (const t of ["~1 h", "~2 h", "~4 h", "Hoy", "Otro"]) {
@@ -234,7 +242,7 @@ describe("Vista de responsable", () => {
     fireEvent.click(screen.getByRole("button", { name: "Una casa menos" }));
     fireEvent.click(screen.getByRole("button", { name: "Guardar cambios" }));
     await screen.findByText("Listo. Guardamos los cambios del viaje.");
-    expect(screen.getByText("$160 por casa")).toBeTruthy();
+    expect(await screen.findByText("$160 por casa")).toBeTruthy();
     // Con el mínimo en 3 y 3 casas anotadas, el viaje ya está listo (P-15).
     expect(screen.getAllByText("Listo para pedir").length).toBeGreaterThan(0);
     expect(
@@ -286,6 +294,14 @@ describe("E-P12 · tomar la responsabilidad", () => {
       screen.getByRole("button", { name: "Tomar la responsabilidad" }),
     );
     const dialogo = await screen.findByRole("dialog");
+    expect(
+      within(dialogo).queryByText(/Gracias por abrir este viaje/),
+    ).toBeNull();
+    expect(
+      within(dialogo).getByText(
+        /^Quien coordina el viaje ayuda a llamar al pipero/,
+      ),
+    ).toBeTruthy();
     // Sin aceptar el disclaimer, la `Api` lo rechaza dentro del diálogo.
     fireEvent.click(
       within(dialogo).getByRole("button", { name: "Sí, me encargo" }),

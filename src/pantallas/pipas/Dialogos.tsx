@@ -1,4 +1,3 @@
-import { memo } from "preact/compat";
 import { useState } from "preact/hooks";
 import type { ViajeVista } from "../../api";
 import { Aviso, Boton, CampoGrande, Casilla, Dialogo } from "../../componentes";
@@ -26,6 +25,7 @@ function Pie({
   deshabilitado,
   razon,
   error,
+  focoInicial = true,
 }: {
   si: string;
   alConfirmar: () => void;
@@ -33,6 +33,7 @@ function Pie({
   deshabilitado?: boolean;
   razon?: string;
   error: string | null;
+  focoInicial?: boolean;
 }) {
   return (
     <>
@@ -40,7 +41,7 @@ function Pie({
       <div class="acciones acciones--pila">
         <Boton
           variante="primario"
-          focoInicial
+          focoInicial={focoInicial}
           id="dialogo-si"
           deshabilitado={deshabilitado}
           razon={razon}
@@ -76,9 +77,10 @@ function ContenidoPedir({
         aria-label={d.grupo}
         style={{ display: "flex", flexWrap: "wrap", gap: "var(--e-2)" }}
       >
-        {d.opciones.map((o) => (
+        {d.opciones.map((o, i) => (
           <button
             key={o.eta}
+            data-foco-inicial={i === 0 ? "" : undefined}
             type="button"
             class={
               elegida === o.eta ? "btn btn--primario" : "btn btn--secundario"
@@ -116,6 +118,7 @@ function ContenidoPedir({
         deshabilitado={eta === ""}
         razon={eta === "" ? d.elige : undefined}
         error={error}
+        focoInicial={false}
       />
     </>
   );
@@ -133,7 +136,7 @@ function ContenidoTomar({
   const [acepta, setAcepta] = useState(false);
   return (
     <>
-      <p>{pipas.disclaimerResponsable.texto}</p>
+      <p>{pipas.disclaimerResponsable.textoTomar}</p>
       <Casilla id="tomar-acepta" marcada={acepta} onCambio={setAcepta}>
         {pipas.disclaimerResponsable.casilla}
       </Casilla>
@@ -147,7 +150,8 @@ function ContenidoTomar({
   );
 }
 
-function DialogoPipasInterno(p: PropsDialogos) {
+/** Los cinco diálogos de confirmación de la pantalla de pipas. */
+export function DialogoPipas(p: PropsDialogos) {
   const d = pipas.dialogos;
   switch (p.tipo) {
     case "baja":
@@ -225,21 +229,3 @@ function DialogoPipasInterno(p: PropsDialogos) {
       );
   }
 }
-
-/**
- * Los cinco diálogos de confirmación de la pantalla de pipas.
- *
- * Solo se vuelve a pintar si cambia el diálogo, su viaje o su error. El
- * componente `Dialogo` pinta su contenido en otra raíz desde un efecto, y si
- * se re-renderiza dos veces antes de que ese efecto corra, preact/debug avisa
- * de «hook fuera de render». Las acciones no dependen de las props viejas
- * (solo usan el id del viaje y funciones estables), así que no hace falta.
- */
-export const DialogoPipas = memo(
-  DialogoPipasInterno,
-  (a, b) =>
-    a.tipo === b.tipo &&
-    a.viaje.id === b.viaje.id &&
-    a.viaje.estado === b.viaje.estado &&
-    a.error === b.error,
-);

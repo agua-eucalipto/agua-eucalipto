@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import type { Resultado, ResultadoEntrega, ViajeVista } from "../../api";
+import { subruta } from "../../app/ruta";
 import { api, reloj, sesion } from "../../app/servicios";
 import { Aviso, Boton } from "../../componentes";
 import { textos } from "../../textos";
@@ -8,7 +9,7 @@ import { DetalleViaje } from "./DetalleViaje";
 import { DialogoPipas } from "./Dialogos";
 import { textoDeError } from "./errores";
 import { ListaEspera } from "./Espera";
-import { DOS_COLUMNAS, esActivo } from "./formato";
+import { esActivo } from "./formato";
 import {
   datosParaAbrir,
   FormularioViaje,
@@ -26,6 +27,36 @@ type Vista =
   | { tipo: "abrir" }
   | { tipo: "editar"; id: string };
 
+function vistaDe(sub: string): Vista {
+  if (sub === "") return { tipo: "lista" };
+  const [primero = "", segundo] = sub.split("/");
+  if (primero === "abrir") return { tipo: "abrir" };
+  const id = decodeURIComponent(primero);
+  return segundo === "editar"
+    ? { tipo: "editar", id }
+    : { tipo: "detalle", id };
+}
+
+const hashDe = (v: Vista): string =>
+  v.tipo === "lista"
+    ? "#pipas"
+    : v.tipo === "abrir"
+      ? "#pipas/abrir"
+      : v.tipo === "detalle"
+        ? `#pipas/${encodeURIComponent(v.id)}`
+        : `#pipas/${encodeURIComponent(v.id)}/editar`;
+
+/** Ir a una vista deja una entrada en el historial; `reemplazar` no. */
+function irA(v: Vista, reemplazar = false) {
+  if (reemplazar) {
+    // `replaceState` no avisa del cambio; la navegación del shell lo espera.
+    window.history.replaceState(window.history.state, "", hashDe(v));
+    window.dispatchEvent(new Event("hashchange"));
+  } else {
+    window.location.hash = hashDe(v);
+  }
+}
+
 interface AvisoPantalla {
   tono: "info" | "error";
   texto: string;
@@ -34,13 +65,15 @@ interface AvisoPantalla {
 /**
  * Pantalla de Pipas privadas. Muestra lo que devuelve la `Api` (viajes, espera
  * y sus banderas) y le manda las acciones; ninguna regla vive aquí. El detalle
- * de un viaje y el formulario son vistas internas: la ruta sigue siendo `#pipas`.
+ * de un viaje y el formulario son subrutas de `#pipas` (`#pipas/<id>`,
+ * `#pipas/abrir`, `#pipas/<id>/editar`), así «Atrás» recorre la pantalla.
  */
 export function PantallaPipas() {
   const ahora = reloj.value;
   const { rol, casa } = sesion.value;
   const { carga, recargar } = usarDatosPipas();
-  const [vista, setVista] = useState<Vista>({ tipo: "lista" });
+  const sub = subruta.value;
+  const vista = vistaDe(sub);
   const [dialogo, setDialogo] = useState<{
     tipo: TipoDialogo;
     id: string;
@@ -54,8 +87,13 @@ export function PantallaPipas() {
   const primeraVista = useRef(true);
 
   // Otra casa u otro rol: se empieza de cero.
+  const primeraSesion = useRef(true);
   useEffect(() => {
-    setVista({ tipo: "lista" });
+    if (primeraSesion.current) {
+      primeraSesion.current = false;
+      return;
+    }
+    if (subruta.peek() !== "") irA({ tipo: "lista" }, true);
     setDialogo(null);
     setAviso(null);
     setErrorDialogo(null);
@@ -63,7 +101,6 @@ export function PantallaPipas() {
   }, [rol, casa]);
 
   // Al cambiar de vista, el foco va al título de esa vista.
-  const claveVista = vista.tipo === "lista" ? "lista" : `${vista.tipo}`;
   useEffect(() => {
     if (primeraVista.current) {
       primeraVista.current = false;
@@ -75,7 +112,7 @@ export function PantallaPipas() {
         : document.getElementById("titulo-vista");
     destino?.focus({ preventScroll: true });
     window.scrollTo?.(0, 0);
-  }, [claveVista, "id" in vista ? vista.id : ""]);
+  }, [sub]);
 
   useEffect(() => {
     if (aviso) avisoRef.current?.scrollIntoView?.({ block: "nearest" });
@@ -84,6 +121,13 @@ export function PantallaPipas() {
   const datos = carga.estado === "listo" ? carga.datos : null;
   const viajeDe = (id: string): ViajeVista | undefined =>
     datos?.viajes.find((v) => v.id === id);
+
+  // Un viaje que ya no existe (p. ej. se cerró) lleva de vuelta a la lista.
+  const idDeVista = "id" in vista ? vista.id : null;
+  const falta = datos !== null && idDeVista !== null && !viajeDe(idDeVista);
+  useEffect(() => {
+    if (falta) irA({ tipo: "lista" }, true);
+  }, [falta]);
 
   /**
    * Corre una acción de la `Api`. Un rechazo de regla se muestra con el texto
@@ -94,6 +138,8 @@ export function PantallaPipas() {
     llamada: () => Promise<Resultado<T>>,
     alExito: (datos: T) => string | null,
     dondeError: "pantalla" | "dialogo" | "formulario" = "pantalla",
+    /** Corre ya con los datos nuevos leídos (p. ej. para ir al viaje recién creado). */
+    despues?: (datos: T) => void,
   ): Promise<boolean> {
     if (enCurso.current) return false;
     enCurso.current = true;
@@ -106,6 +152,7 @@ export function PantallaPipas() {
         setErrorDialogo(null);
         setErrorFormulario(null);
         await recargar();
+        despues?.(r.datos);
         return true;
       }
       const texto = textoDeError(r.error);
@@ -143,7 +190,7 @@ export function PantallaPipas() {
   const acciones: AccionesPipas = {
     ver: (id) => {
       setAviso(null);
-      setVista({ tipo: "detalle", id });
+      irA({ tipo: "detalle", id });
     },
     anotarse: (v) =>
       void correr(
@@ -161,12 +208,12 @@ export function PantallaPipas() {
     nuevo: () => {
       setAviso(null);
       setErrorFormulario(null);
-      setVista({ tipo: "abrir" });
+      irA({ tipo: "abrir" });
     },
     editar: (v) => {
       setAviso(null);
       setErrorFormulario(null);
-      setVista({ tipo: "editar", id: v.id });
+      irA({ tipo: "editar", id: v.id });
     },
     salirDeEspera: () =>
       void correr(
@@ -198,24 +245,22 @@ export function PantallaPipas() {
             minimo_casas: d.minimo_casas,
             capacidad_aprox: d.capacidad_aprox ?? null,
           }),
-        () => {
-          setVista({ tipo: "detalle", id: editando.id });
-          return pipas.exito.editado;
-        },
+        () => pipas.exito.editado,
         "formulario",
+        () => irA({ tipo: "detalle", id: editando.id }, true),
       );
       return;
     }
     void correr(
       () => api.abrir_viaje(datosParaAbrir(d)),
       (v) => {
-        setVista({ tipo: "detalle", id: v.id });
         const sumadas = v.anotadas - 1;
         return sumadas > 0
           ? `${pipas.exito.abierto} ${pipas.exito.sumadas(sumadas)}.`
           : pipas.exito.abierto;
       },
       "formulario",
+      (v) => irA({ tipo: "detalle", id: v.id }, true),
     );
   }
 
@@ -249,7 +294,7 @@ export function PantallaPipas() {
           void desdeDialogo(
             async () => api.cancelar_viaje(viajeDialogo.id),
             () => pipas.exito.cancelado,
-            () => setVista({ tipo: "lista" }),
+            () => irA({ tipo: "lista" }, true),
           )
         }
         tomar={(acepta) =>
@@ -290,7 +335,7 @@ export function PantallaPipas() {
         error={errorFormulario}
         enviando={enviando}
         alEnviar={(d) => enviarFormulario(d, undefined)}
-        volver={() => setVista({ tipo: "lista" })}
+        volver={() => irA({ tipo: "lista" })}
       />
     );
   } else if (vista.tipo === "editar" && viajeDe(vista.id)) {
@@ -301,7 +346,7 @@ export function PantallaPipas() {
         error={errorFormulario}
         enviando={enviando}
         alEnviar={(d) => enviarFormulario(d, viaje)}
-        volver={() => setVista({ tipo: "detalle", id: viaje.id })}
+        volver={() => irA({ tipo: "detalle", id: viaje.id })}
       />
     );
   } else if (vista.tipo === "detalle" && viajeDe(vista.id)) {
@@ -311,14 +356,14 @@ export function PantallaPipas() {
         casa={datos.casa}
         viajes={datos.viajes}
         acciones={acciones}
-        volver={() => setVista({ tipo: "lista" })}
+        volver={() => irA({ tipo: "lista" })}
       />
     );
   } else {
     cuerpo = (
       <>
         <MiSituacion datos={datos} ahora={ahora} acciones={acciones} />
-        <div class="dos-columnas" style={DOS_COLUMNAS}>
+        <div class="dos-columnas">
           <section class="seccion" aria-labelledby="h-viajes">
             <h2 id="h-viajes" tabIndex={-1}>
               {pipas.secciones.abiertos}

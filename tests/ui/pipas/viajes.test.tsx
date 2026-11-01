@@ -332,3 +332,95 @@ describe("Errores inesperados", () => {
     await act(async () => {});
   });
 });
+
+describe("Atrás del navegador", () => {
+  const esperarHash = (hash: string) =>
+    waitFor(() => expect(window.location.hash).toBe(hash));
+
+  it("lista → detalle → Atrás vuelve a la lista de Pipas", async () => {
+    await montar();
+    const id = await idDeViaje("Rubén 1");
+    fireEvent.click(
+      screen.getByRole("button", { name: "Ver casas del viaje de Rubén 1" }),
+    );
+    await esperarHash(`#pipas/${id}`);
+    await screen.findByRole("button", { name: /Volver a Pipas/ });
+    window.history.back();
+    await esperarHash("#pipas");
+    await screen.findByRole("heading", { name: "Viajes abiertos" });
+    expect(screen.queryByRole("button", { name: /Volver a Pipas/ })).toBeNull();
+    window.history.forward();
+    await esperarHash(`#pipas/${id}`);
+    await screen.findByRole("heading", { name: "Rubén 1" });
+  });
+
+  it("«Volver a Pipas» lleva a #pipas", async () => {
+    await montar();
+    await verCasas("Rubén 1");
+    fireEvent.click(screen.getByRole("button", { name: /Volver a Pipas/ }));
+    await esperarHash("#pipas");
+    await screen.findByRole("heading", { name: "Viajes abiertos" });
+  });
+
+  it("el formulario vive en #pipas/abrir y Atrás regresa a la lista", async () => {
+    await montar();
+    fireEvent.click(boton(situacion(), /Abrir un viaje/));
+    await esperarHash("#pipas/abrir");
+    await screen.findByRole("heading", { name: "Abrir un viaje" });
+    window.history.back();
+    await esperarHash("#pipas");
+    await screen.findByRole("heading", { name: "Viajes abiertos" });
+  });
+
+  it("editar usa #pipas/<id>/editar y guardar muestra el detalle en lugar del formulario", async () => {
+    await montar();
+    await comoCasa("12");
+    const id = await idDeViaje("Rubén 1");
+    await verCasas("Rubén 1");
+    fireEvent.click(screen.getByRole("button", { name: "Editar" }));
+    await esperarHash(`#pipas/${id}/editar`);
+    await screen.findByRole("heading", { name: "Editar el viaje" });
+    fireEvent.click(screen.getByRole("button", { name: "Guardar cambios" }));
+    await esperarHash(`#pipas/${id}`);
+    await screen.findByText("Listo. Guardamos los cambios del viaje.");
+    expect(
+      screen.queryByRole("heading", { name: "Editar el viaje" }),
+    ).toBeNull();
+    // El formulario no queda en el historial: Atrás regresa al detalle.
+    window.history.back();
+    await esperarHash(`#pipas/${id}`);
+    await screen.findByRole("heading", { name: "Rubén 1" });
+    window.history.back();
+    await esperarHash("#pipas");
+  });
+
+  it("un enlace directo a un viaje abre su detalle", async () => {
+    window.location.hash = `#pipas/${await idDeViaje("Don Beto")}`;
+    await montar();
+    await screen.findByRole("heading", { name: "Don Beto" });
+  });
+
+  it("un id que ya no existe regresa a la lista", async () => {
+    window.location.hash = "#pipas/no-existe";
+    await montar().catch(() => {});
+    await waitFor(() => expect(window.location.hash).toBe("#pipas"));
+    await screen.findByRole("heading", { name: "Viajes abiertos" });
+  });
+
+  it("si el viaje que se mira se cierra, vuelve a la lista", async () => {
+    await montar();
+    await adelantarDias(1);
+    await verCasas("Pipas El Pozo");
+    await adelantarDias(1);
+    await waitFor(() => expect(window.location.hash).toBe("#pipas"));
+    await screen.findByRole("heading", { name: "Viajes abiertos" });
+  });
+
+  it("cambiar de casa regresa a la lista", async () => {
+    await montar();
+    await verCasas("Rubén 1");
+    await comoCasa("9");
+    await waitFor(() => expect(window.location.hash).toBe("#pipas"));
+    await screen.findByRole("heading", { name: "Viajes abiertos" });
+  });
+});

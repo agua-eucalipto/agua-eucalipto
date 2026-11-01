@@ -9,7 +9,7 @@ import {
 } from "../../componentes";
 import { fechaCorta } from "../../app/formato";
 import { textos } from "../../textos";
-import { DOS_COLUMNAS, textoDeEstado, visualDeEstado } from "./formato";
+import { textoDeEstado, visualDeEstado } from "./formato";
 import { viajePorConfirmar } from "./MiSituacion";
 import { MarcasViaje } from "./TarjetaDeViaje";
 import type { AccionesPipas } from "./tipos";
@@ -157,7 +157,7 @@ export function DetalleViaje({
         </h2>
         <p class="titulo-pantalla__resumen">{resumen}</p>
       </div>
-      <div class="dos-columnas" style={DOS_COLUMNAS}>
+      <div class="dos-columnas">
         <Tarjeta etiqueta={pipas.secciones.estado}>
           <div>
             <Insignia
