@@ -4,6 +4,7 @@ dist/
 coverage/
 playwright-report/
 test-results/
+tests/e2e/artefactos/
 .DS_Store
 
 # Variables locales
