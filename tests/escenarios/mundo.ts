@@ -56,6 +56,9 @@ export const METODOS_API = [
   "marcar_sigue_pendiente",
   "marcar_surtido",
   "marcar_sin_surtir",
+  "mi_reporte_aljibe",
+  "reportar_nivel_aljibe",
+  "listar_aljibes",
   "listar_viajes",
   "listar_espera",
   "abrir_viaje",
@@ -81,6 +84,8 @@ export const METODOS_DEMO = [
   "demo_ver_como",
   "demo_adelantar_reloj",
   "demo_reiniciar",
+  "demo_mostrar_aljibe",
+  "demo_fijar_aljibe",
 ] as const satisfies readonly (keyof ApiDemo)[];
 
 /** Falla al compilar si el contrato gana un método que la lista no conoce. */

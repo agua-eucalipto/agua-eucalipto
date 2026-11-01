@@ -1,4 +1,8 @@
-import { ordenCasa } from "../../dominio";
+import {
+  ordenCasa,
+  type MarcaEvidencia,
+  type NivelAljibe,
+} from "../../dominio";
 import type {
   Canal,
   CierreFolio,
@@ -111,6 +115,16 @@ export interface Evento {
   detalle: Record<string, string | number | boolean | null>;
 }
 
+/** Último nivel reportado por una casa. La foto no se guarda aquí. */
+export interface ReporteAljibeGuardado {
+  id: string;
+  casa_numero: string;
+  nivel: NivelAljibe;
+  reportado_at: number;
+  marcas: MarcaEvidencia[];
+  camara: string | null;
+}
+
 /** Sesión simulada del celular. El teléfono nunca sale de la `Api`. */
 export interface SesionDemo {
   telefono: string | null;
@@ -139,6 +153,12 @@ export interface EstadoDemo {
   siguiente_evento_id: number;
   /** Lo que se ha adelantado el reloj con `demo_adelantar_reloj`; se reaplica al recargar. */
   desfase_reloj_ms: number;
+  /** Casilla del menú Demo. Apagada al empezar y al reiniciar. */
+  mostrar_aljibe: boolean;
+  /** Un reporte por casa: el más reciente. */
+  reportes_aljibe: ReporteAljibeGuardado[];
+  /** Huellas SHA-256 ya usadas, de cualquier casa. */
+  huellas_foto: string[];
 }
 
 /** Datos con los que arranca el demo: catálogo, lista blanca y coordinadores. */
@@ -209,5 +229,25 @@ export function crearEstadoInicial(
     siguiente_id: 1,
     siguiente_evento_id: 1,
     desfase_reloj_ms: 0,
+    mostrar_aljibe: false,
+    reportes_aljibe: [],
+    huellas_foto: [],
   };
+}
+
+/**
+ * Rellena los campos del aljibe si el estado guardado es de antes de esa
+ * función. No cambia la versión: así el demo que ya estaba abierto sigue.
+ */
+export function completarEstado(estado: EstadoDemo): EstadoDemo {
+  if (typeof estado.mostrar_aljibe !== "boolean") {
+    estado.mostrar_aljibe = false;
+  }
+  if (!Array.isArray(estado.reportes_aljibe)) {
+    estado.reportes_aljibe = [];
+  }
+  if (!Array.isArray(estado.huellas_foto)) {
+    estado.huellas_foto = [];
+  }
+  return estado;
 }

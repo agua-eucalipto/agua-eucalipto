@@ -1,0 +1,45 @@
+.aljibe-niveles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--e-2);
+}
+.aljibe-nivel {
+  width: 100%;
+  min-height: var(--toque-min);
+}
+.aljibe-foto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-2);
+  font-weight: var(--peso-fuerte);
+}
+.aljibe-foto input {
+  font: inherit;
+  min-height: var(--toque-min);
+  max-width: 100%;
+}
+.aljibe-foto-previa {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  border-radius: var(--r-control);
+}
+.aljibe-marcas {
+  margin: 0;
+  padding-left: 1.2em;
+}
+.aljibes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-2);
+}
+.aljibes li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-2);
+  align-items: baseline;
+}

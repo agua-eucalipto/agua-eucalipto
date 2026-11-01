@@ -23,7 +23,11 @@ export type NombreIcono =
   | "copiar"
   | "casa"
   | "reloj"
-  | "salida";
+  | "salida"
+  | "aljibe-vacio"
+  | "aljibe-bajo"
+  | "aljibe-medio"
+  | "aljibe-lleno";
 
 const RUTAS: Record<NombreIcono, string> = {
   gota: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
@@ -58,6 +62,10 @@ const RUTAS: Record<NombreIcono, string> = {
   casa: '<path d="M3 11l9-7 9 7"/><path d="M5.5 9.5V20h13V9.5"/>',
   reloj: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
   salida: '<path d="M10 4H5v16h5"/><path d="M14 8l4 4-4 4M18 12H9"/>',
+  "aljibe-vacio": '<path d="M7 5h10v14H7z"/>',
+  "aljibe-bajo": '<path d="M7 5h10v14H7z"/><path d="M7 15h10"/>',
+  "aljibe-medio": '<path d="M7 5h10v14H7z"/><path d="M7 12h10"/>',
+  "aljibe-lleno": '<path d="M7 5h10v14H7z"/><path d="M7 8h10"/>',
 };
 
 /** Ícono decorativo: siempre `aria-hidden`; el texto vecino lo nombra. */

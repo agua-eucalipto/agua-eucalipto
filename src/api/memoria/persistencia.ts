@@ -1,4 +1,4 @@
-import { VERSION_ESTADO, type EstadoDemo } from "./estado";
+import { VERSION_ESTADO, completarEstado, type EstadoDemo } from "./estado";
 
 /** Lo que el adaptador usa de `localStorage`; en pruebas se sustituye. */
 export type Almacen = Pick<Storage, "getItem" | "setItem">;
@@ -52,7 +52,7 @@ export function leerEstado(almacen: Almacen): EstadoDemo | null {
   }
   try {
     const valor: unknown = JSON.parse(texto);
-    return pareceEstado(valor) ? valor : null;
+    return pareceEstado(valor) ? completarEstado(valor) : null;
   } catch {
     return null;
   }

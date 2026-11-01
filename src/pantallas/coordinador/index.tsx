@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "preact/hooks";
 import type { SolicitudAcceso, TelefonoVista } from "../../api";
-import { api, reloj, sesion } from "../../app/servicios";
+import { api, mostrarAljibe, reloj, sesion } from "../../app/servicios";
 import { Aviso, PantallaVacia } from "../../componentes";
 import { comun, coordinador } from "../../textos";
 import "./coordinador.css";
+import { ListaAljibes } from "./Aljibes";
 import { ListaParaCaseta } from "./ListaCaseta";
 import { Solicitudes } from "./Solicitudes";
 import { Telefonos } from "./Telefonos";
@@ -28,6 +29,7 @@ export function PantallaCoordinador() {
   const rol = sesion.value.rol;
   const casa = sesion.value.casa;
   const ahora = reloj.value;
+  const aljibeVisible = mostrarAljibe.value;
 
   const cargar = useCallback(async () => {
     try {
@@ -66,20 +68,23 @@ export function PantallaCoordinador() {
     return <Aviso tono="error">{coordinador.fallo}</Aviso>;
   }
   return (
-    <div class="panel-coordinador dos-columnas">
-      <ListaParaCaseta alNoAutorizado={sinPermiso} />
-      <div class="seccion coordinador-lateral">
-        <Solicitudes
-          solicitudes={carga.solicitudes}
-          alCambiar={() => void cargar()}
-          alNoAutorizado={sinPermiso}
-        />
-        <Telefonos
-          telefonos={carga.telefonos}
-          alCambiar={() => void cargar()}
-          alNoAutorizado={sinPermiso}
-        />
+    <>
+      {aljibeVisible ? <ListaAljibes /> : null}
+      <div class="panel-coordinador dos-columnas">
+        <ListaParaCaseta alNoAutorizado={sinPermiso} />
+        <div class="seccion coordinador-lateral">
+          <Solicitudes
+            solicitudes={carga.solicitudes}
+            alCambiar={() => void cargar()}
+            alNoAutorizado={sinPermiso}
+          />
+          <Telefonos
+            telefonos={carga.telefonos}
+            alCambiar={() => void cargar()}
+            alNoAutorizado={sinPermiso}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

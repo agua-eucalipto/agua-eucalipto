@@ -100,6 +100,11 @@ export type ResultadoEntrega = "surtio" | "pendiente";
 
 export type PerfilDemo = "vecino" | "coordinador" | "otra_calle";
 
+export type NivelAljibe = "vacio" | "bajo" | "medio" | "lleno";
+
+/** Marcas informativas de una foto. No bloquean el reporte. */
+export type MarcaEvidencia = "foto_repetida" | "foto_antigua" | "sin_fecha";
+
 // ---------------------------------------------------------------------------
 // Sesión y acceso
 // ---------------------------------------------------------------------------
@@ -174,6 +179,36 @@ export interface FolioVista {
   vence_hoy: boolean;
   /** Fecha del último envío a caseta en que apareció; `null` si nunca. */
   ultimo_envio_caseta_at: number | null;
+}
+
+// ---------------------------------------------------------------------------
+// Aljibe (demo)
+// ---------------------------------------------------------------------------
+
+/** Último reporte de nivel de una casa. No incluye la foto ni su huella. */
+export interface ReporteAljibe {
+  id: string;
+  casa_numero: string;
+  nivel: NivelAljibe;
+  reportado_at: number;
+  marcas: MarcaEvidencia[];
+  /** Fabricante y modelo leídos del EXIF, si venían. */
+  camara: string | null;
+}
+
+/**
+ * El reporte de la casa de la sesión. `foto_url` vive solo en memoria
+ * (data URL) y se pierde al reiniciar o al recargar.
+ */
+export interface ReporteAljibeVista extends ReporteAljibe {
+  foto_url: string | null;
+}
+
+/** Archivo elegido en el navegador. La Api no lo envía a ningún servidor. */
+export interface FotoAljibe {
+  bytes: Uint8Array;
+  /** MIME, por ejemplo `image/jpeg`. Vacío si el navegador no lo indica. */
+  tipo: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -432,6 +467,28 @@ export interface Api {
    */
   marcar_sin_surtir(folio_id: string): Promise<Resultado<FolioVista>>;
 
+  // Aljibe
+
+  /**
+   * Último reporte de la casa de la sesión, o `null` si aún no hay.
+   * Errores: `NO_AUTORIZADO`.
+   */
+  mi_reporte_aljibe(): Promise<Resultado<ReporteAljibeVista | null>>;
+
+  /**
+   * Guarda el nivel de la casa. La foto es opcional. Las marcas de evidencia
+   * solo informan. Errores: `NO_AUTORIZADO`, `DATOS_INVALIDOS`.
+   */
+  reportar_nivel_aljibe(
+    nivel: NivelAljibe,
+    foto?: FotoAljibe | null,
+  ): Promise<Resultado<ReporteAljibeVista>>;
+
+  /**
+   * Último reporte de cada casa. Errores: `NO_AUTORIZADO`.
+   */
+  listar_aljibes(): Promise<Resultado<ReporteAljibe[]>>;
+
   // Pipas
 
   /** Viajes no cerrados y los terminados en los últimos 4 días. */
@@ -542,6 +599,15 @@ export interface ApiDemo {
    */
   demo_adelantar_reloj(horas?: number): Promise<Resultado<{ ahora: number }>>;
 
-  /** Regresa a los datos de ejemplo y al reloj real. */
+  /** Regresa a los datos de ejemplo y al reloj real. Apaga el nivel del aljibe. */
   demo_reiniciar(): Promise<Resultado<void>>;
+
+  /** Si el menú del demo muestra el nivel del aljibe. Apagado al empezar. */
+  demo_mostrar_aljibe(): Promise<Resultado<boolean>>;
+
+  /**
+   * Enciende o apaga el nivel del aljibe para esta sesión del demo.
+   * Errores: `DATOS_INVALIDOS`.
+   */
+  demo_fijar_aljibe(activo: boolean): Promise<Resultado<boolean>>;
 }

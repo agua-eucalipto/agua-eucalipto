@@ -8,7 +8,7 @@ import {
   type NombreIcono,
 } from "../../componentes";
 import { TOPE_FOLIOS_POR_CASA } from "../../dominio";
-import { api, reloj, sesion } from "../../app/servicios";
+import { api, mostrarAljibe, reloj, sesion } from "../../app/servicios";
 import { fechaCorta } from "../../app/formato";
 import { resumenTitulo } from "../../app/titulo";
 import { comun, siapa } from "../../textos";
@@ -18,6 +18,7 @@ import {
   DialogoSinSurtir,
   DialogoSurtido,
 } from "./Dialogos";
+import { NivelAljibe } from "./NivelAljibe";
 import { esHistorial, insigniaDe, porVencimiento } from "./util";
 
 type Abierto =
@@ -156,6 +157,7 @@ export function PantallaSiapa() {
   // de sesión se vuelve a pedir la lista sin recargar la página.
   const ahora = reloj.value;
   const { casa, rol } = sesion.value;
+  const aljibeVisible = mostrarAljibe.value && casa !== null;
   const clave = `${casa ?? ""}|${rol}`;
   const folios = !falla && leidos?.clave === clave ? leidos.folios : null;
 
@@ -221,6 +223,7 @@ export function PantallaSiapa() {
 
   return (
     <>
+      {aljibeVisible ? <NivelAljibe key={casa ?? ""} /> : null}
       <Boton
         variante="primario"
         ancho

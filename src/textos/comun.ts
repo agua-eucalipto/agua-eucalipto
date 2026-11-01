@@ -40,6 +40,7 @@ export const comun = {
     casa: "Casa",
     adelantar: "Adelantar 1 día",
     reiniciar: "Reiniciar",
+    aljibe: "Mostrar nivel del aljibe (prueba)",
     confirmarReinicio: "Se borran los cambios y vuelven los datos de ejemplo.",
     tituloReiniciar: "¿Reiniciar el demo?",
     siReiniciar: "Sí, reiniciar",
