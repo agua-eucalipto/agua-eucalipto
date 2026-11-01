@@ -1,6 +1,6 @@
 import type { ComponentChildren } from "preact";
-import { render } from "preact";
-import { useEffect, useId, useRef } from "preact/hooks";
+import { createPortal } from "preact/compat";
+import { useEffect, useId, useRef, useState } from "preact/hooks";
 
 const FOCALIZABLES =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -22,16 +22,14 @@ export function Dialogo({
   onCerrar: () => void;
   children: ComponentChildren;
 }) {
-  const host = useRef<HTMLDivElement | null>(null);
+  const [anfitrion] = useState(() => document.createElement("div"));
   const cerrar = useRef(onCerrar);
   cerrar.current = onCerrar;
   const idTitulo = useId();
   const idDescripcion = useId();
 
   useEffect(() => {
-    const anfitrion = document.createElement("div");
     document.body.appendChild(anfitrion);
-    host.current = anfitrion;
     const previo = document.activeElement as HTMLElement | null;
     const app = document.getElementById("app");
     app?.setAttribute("inert", "");
@@ -66,9 +64,7 @@ export function Dialogo({
 
     return () => {
       document.removeEventListener("keydown", alTeclear);
-      render(null, anfitrion);
       anfitrion.remove();
-      host.current = null;
       app?.removeAttribute("inert");
       app?.removeAttribute("aria-hidden");
       previo?.focus?.();
@@ -76,25 +72,6 @@ export function Dialogo({
   }, []);
 
   useEffect(() => {
-    const anfitrion = host.current;
-    if (!anfitrion) return;
-    render(
-      <>
-        <div class="velo" onClick={() => cerrar.current()} />
-        <div
-          class="dialogo"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={idTitulo}
-          aria-describedby={descripcion ? idDescripcion : undefined}
-        >
-          <h2 id={idTitulo}>{titulo}</h2>
-          {descripcion ? <p id={idDescripcion}>{descripcion}</p> : null}
-          {children}
-        </div>
-      </>,
-      anfitrion,
-    );
     if (!anfitrion.contains(document.activeElement)) {
       const inicial =
         anfitrion.querySelector<HTMLElement>("[data-foco-inicial]") ??
@@ -103,5 +80,21 @@ export function Dialogo({
     }
   });
 
-  return null;
+  return createPortal(
+    <>
+      <div class="velo" onClick={() => cerrar.current()} />
+      <div
+        class="dialogo"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={idTitulo}
+        aria-describedby={descripcion ? idDescripcion : undefined}
+      >
+        <h2 id={idTitulo}>{titulo}</h2>
+        {descripcion ? <p id={idDescripcion}>{descripcion}</p> : null}
+        {children}
+      </div>
+    </>,
+    anfitrion,
+  );
 }
