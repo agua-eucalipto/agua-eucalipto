@@ -10,6 +10,7 @@ import {
 import { TOPE_FOLIOS_POR_CANAL } from "../../dominio";
 import { api, reloj, sesion } from "../../app/servicios";
 import { fechaCorta } from "../../app/formato";
+import { resumenTitulo } from "../../app/titulo";
 import { comun, siapa } from "../../textos";
 import { DialogoPendiente, DialogoRegistro, DialogoSurtido } from "./Dialogos";
 import { esHistorial, insigniaDe, porVencimiento } from "./util";
@@ -178,23 +179,25 @@ export function PantallaSiapa() {
   };
 
   const lista = folios ?? [];
+  const activosCuenta = lista.filter((f) => f.estado === "activo").length;
+  const resumen =
+    casa !== null && folios !== null
+      ? siapa.resumen(casa, activosCuenta, TOPE_FOLIOS_POR_CANAL * 2)
+      : "";
+  useEffect(() => {
+    resumenTitulo.value = resumen;
+    return () => {
+      resumenTitulo.value = "";
+    };
+  }, [resumen]);
+
   const vigentes = lista.filter((f) => !esHistorial(f)).sort(porVencimiento);
   const anteriores = lista
     .filter(esHistorial)
     .sort((a, b) => (b.cerrado_at ?? 0) - (a.cerrado_at ?? 0));
-  const activos = lista.filter((f) => f.estado === "activo").length;
-  const topeTotal = TOPE_FOLIOS_POR_CANAL * 2;
 
   return (
     <>
-      {casa !== null && folios !== null ? (
-        <p
-          class="titulo-pantalla__resumen"
-          style={{ marginBlockStart: "calc(var(--e-4) * -1)" }}
-        >
-          {siapa.resumen(casa, activos, topeTotal)}
-        </p>
-      ) : null}
       <Boton
         variante="primario"
         ancho

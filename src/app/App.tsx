@@ -13,6 +13,7 @@ import { Encabezado } from "./Encabezado";
 import { Navegacion } from "./Pestanas";
 import { iniciarNavegacion, rutaActual, type Ruta } from "./ruta";
 import { arrancarSesionDemo, sesion } from "./servicios";
+import { resumenTitulo } from "./titulo";
 
 const { comun } = textos;
 
@@ -62,7 +63,11 @@ function Pantalla() {
 
   return (
     <main class="contenido" id="contenido">
-      <TituloPantalla id="titulo-pantalla" titulo={titulo} />
+      <TituloPantalla
+        id="titulo-pantalla"
+        titulo={titulo}
+        resumen={sinPermiso ? undefined : resumenTitulo.value}
+      />
       {sinPermiso ? (
         <Aviso tono="atencion">{comun.noAutorizado}</Aviso>
       ) : info ? (
