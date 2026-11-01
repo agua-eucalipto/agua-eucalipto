@@ -98,8 +98,8 @@ export function ListaParaCaseta({
       <h2 id="h-caseta" class="coordinador-subtitulo">
         {t.titulo}
       </h2>
-      <div class="solo-impresion">
-        <p class="solo-impresion__titulo">
+      <div class="coordinador-impresion">
+        <p class="coordinador-impresion__titulo">
           {t.encabezadoWhatsApp.replace(/\*/g, "")}
         </p>
         {lista ? <p>{fechaLista(lista.generada_at, true)}</p> : null}
@@ -144,15 +144,6 @@ export function ListaParaCaseta({
         >
           {t.imprimir}
         </Boton>
-        {lista === null ? (
-          <Boton
-            variante="texto"
-            deshabilitado={ocupado}
-            onClick={() => void generar("imprimir")}
-          >
-            {t.verVistaPrevia}
-          </Boton>
-        ) : null}
       </div>
       <div class="no-imprimir" aria-live="polite">
         {aviso ? <Aviso tono={aviso.tono}>{aviso.texto}</Aviso> : null}

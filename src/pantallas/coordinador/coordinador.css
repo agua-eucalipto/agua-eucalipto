@@ -40,7 +40,7 @@
 .caseta .tabla th[scope="rowgroup"] {
   white-space: nowrap;
 }
-.solo-impresion {
+.coordinador-impresion {
   display: none;
 }
 
@@ -64,11 +64,11 @@
   .caseta .coordinador-subtitulo {
     display: none;
   }
-  .solo-impresion {
+  .coordinador-impresion {
     display: block;
     margin-bottom: 8pt;
   }
-  .solo-impresion__titulo {
+  .coordinador-impresion__titulo {
     font-size: 18pt;
     font-weight: 700;
   }

@@ -74,6 +74,27 @@ describe("panel de coordinación", () => {
     expect(screen.getByText(/Generar la lista no quema folios/)).toBeTruthy();
   });
 
+  it("entrar y cambiar las casillas no registra ningún envío a caseta", async () => {
+    const enviosEnBitacora = async () => {
+      const r = await api.bitacora(undefined, 200);
+      return r.ok
+        ? r.datos.filter((e) => e.tipo === "lista_caseta_generada").length
+        : -1;
+    };
+    const generar = vi.spyOn(api, "generar_lista_caseta");
+    await comoCoordinador();
+    const antes = await enviosEnBitacora();
+    expect(antes).toBeGreaterThan(0);
+    await screen.findByText(/Última lista: /);
+    fireEvent.click(screen.getByLabelText("Incluir canal"));
+    fireEvent.click(screen.getByLabelText("Incluir días que lleva"));
+    fireEvent.click(screen.getByLabelText("Incluir canal"));
+    expect(screen.queryByRole("button", { name: /vista previa/i })).toBeNull();
+    expect(screen.queryByRole("table")).toBeNull();
+    expect(generar).not.toHaveBeenCalled();
+    expect(await enviosEnBitacora()).toBe(antes);
+  });
+
   it("no ofrece sanciones ni reasignaciones (G-INV-6)", async () => {
     await comoCoordinador();
     const botones = screen

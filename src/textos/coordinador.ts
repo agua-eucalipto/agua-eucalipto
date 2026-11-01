@@ -1,9 +1,5 @@
 /** Textos de la pantalla de coordinación. */
 export const coordinador = {
-  resumen: (casa: string | null) =>
-    casa === null
-      ? "Solo para el equipo de coordinación"
-      : `Casa ${casa} · solo para el equipo de coordinación`,
   cargando: "Cargando…",
   fallo: "Algo no salió como esperábamos. ¿Lo intentas otra vez?",
   caseta: {
@@ -11,7 +7,6 @@ export const coordinador = {
     columnasOpcionales: "Columnas opcionales",
     incluirCanal: "Incluir canal",
     incluirDias: "Incluir días que lleva",
-    verVistaPrevia: "Ver vista previa",
     imprimir: "Imprimir o guardar PDF",
     copiar: "Copiar para WhatsApp",
     copiado: "Copiado",
@@ -28,8 +23,6 @@ export const coordinador = {
     colDias: "Días",
     textoWhatsApp: "Texto para WhatsApp",
     casa: (n: string) => `Casa ${n}`,
-    casas: (n: number) => (n === 1 ? "1 casa" : `${n} casas`),
-    folios: (n: number) => (n === 1 ? "1 folio" : `${n} folios`),
     total: (casas: number, folios: number) =>
       `Total: ${casas === 1 ? "1 casa" : `${casas} casas`}, ${folios === 1 ? "1 folio" : `${folios} folios`}`,
     encabezadoWhatsApp: "*Agua Eucalipto · Folios vigentes*",
@@ -68,7 +61,6 @@ export const coordinador = {
     vacio: "Todavía no hay teléfonos registrados.",
     sinCasa: "Sin casa",
     coordinador: "Coordinación",
-    sinPin: "Aún no crea su PIN",
     reiniciar: "Reiniciar teléfono",
     tituloReiniciar: (casa: string | null) =>
       casa === null
