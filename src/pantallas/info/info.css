@@ -1,0 +1,83 @@
+/* Información (ⓘ). Solo usa los tokens de la app. */
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-6);
+}
+.info-indice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-2);
+}
+.info-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+  scroll-margin-top: var(--e-4);
+}
+.info-seccion h2 {
+  font-size: var(--t-titulo-2);
+  line-height: var(--interlinea-titulo);
+}
+.info-seccion h3 {
+  font-size: var(--t-titulo-3);
+  line-height: var(--interlinea-titulo);
+  margin-bottom: var(--e-1);
+}
+.info-seccion h2:focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 3px;
+}
+.info-piloto {
+  padding: var(--e-4);
+  border-radius: var(--r-tarjeta);
+  background: var(--marca-suave);
+}
+.info-tutorial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  align-items: flex-start;
+}
+.reglas {
+  margin: var(--e-3) 0 0;
+  padding-left: var(--e-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+}
+.privacidad {
+  margin: 0;
+  padding-left: var(--e-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+}
+.bitacora {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.bitacora__evento {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-1);
+  padding: var(--e-3) 0;
+  border-bottom: 1px solid var(--linea);
+}
+.bitacora__cuando {
+  font-size: var(--t-chico);
+  color: var(--tinta-2);
+}
+@media (min-width: 960px) {
+  .bitacora__evento {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: var(--e-5);
+  }
+  .bitacora__cuando {
+    flex: none;
+  }
+}

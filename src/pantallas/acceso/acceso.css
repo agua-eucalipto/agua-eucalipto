@@ -1,0 +1,157 @@
+/* Primera vez: aviso, tutorial y acceso. Pantalla completa bajo la barra del demo. */
+.capa {
+  position: fixed;
+  inset: var(--capa-arriba, 0px) 0 0 0;
+  z-index: 35;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--papel);
+  color: var(--tinta);
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+.capa__hoja {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: var(--e-6) var(--e-4) var(--e-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-5);
+  animation: capa-entra var(--dur-media) var(--curva-salida);
+}
+@keyframes capa-entra {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+.capa__marca .marca__nombre {
+  font-size: var(--t-medio);
+  font-weight: var(--peso-fuerte);
+  color: var(--marca);
+}
+.capa__titulo {
+  font-size: var(--t-titulo-1);
+  line-height: var(--interlinea-titulo);
+}
+.capa__texto {
+  font-size: var(--t-medio);
+}
+.capa .acciones--capa {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+}
+.capa .acciones--capa .btn {
+  width: 100%;
+}
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-5);
+}
+
+/* Tutorial */
+.tarjeta-tutorial {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--r-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+  padding: var(--e-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  touch-action: pan-y;
+  min-height: 280px;
+}
+.tarjeta-tutorial__icono {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--r-pastilla);
+  background: var(--marca-suave);
+  color: var(--marca);
+  display: grid;
+  place-items: center;
+}
+.tarjeta-tutorial__icono .icono {
+  width: 40px;
+  height: 40px;
+}
+.tarjeta-tutorial__paso {
+  font-size: var(--t-chico);
+  color: var(--tinta-2);
+}
+.tarjeta-tutorial__titulo {
+  font-size: var(--t-titulo-3);
+  line-height: var(--interlinea-titulo);
+}
+.puntos {
+  display: flex;
+  justify-content: center;
+  gap: var(--e-2);
+}
+.punto {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--r-pastilla);
+  background: var(--linea);
+  border: 1px solid var(--borde-control);
+}
+.punto--activo {
+  background: var(--marca);
+  border-color: var(--marca);
+}
+
+/* Casas */
+.casas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: var(--e-3);
+}
+.casa-boton {
+  min-height: var(--toque-principal);
+  font: inherit;
+  font-size: var(--t-medio);
+  font-weight: var(--peso-fuerte);
+  font-variant-numeric: tabular-nums;
+  color: var(--marca);
+  background: var(--superficie);
+  border: 2px solid var(--marca);
+  border-radius: var(--r-control);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: transform var(--dur-rapida) var(--curva-salida);
+}
+.casa-boton:active {
+  transform: scale(0.97);
+  background: var(--marca-suave);
+}
+.casa-boton:focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .casa-boton:hover {
+    background: var(--marca-suave);
+  }
+}
+
+@media (min-width: 960px) {
+  .capa__hoja {
+    padding-top: var(--e-8);
+  }
+  .capa .acciones--capa {
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+  }
+  .capa .acciones--capa .btn {
+    width: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .capa__hoja {
+    animation: none;
+  }
+}
