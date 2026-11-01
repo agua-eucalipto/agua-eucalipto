@@ -207,8 +207,7 @@
   flex-direction: column;
   gap: var(--e-3);
 }
-.contactos h3,
-.contactos > p:first-child {
+.contactos__titulo {
   font-size: var(--t-titulo-3);
   line-height: var(--interlinea-titulo);
   font-weight: var(--peso-fuerte);

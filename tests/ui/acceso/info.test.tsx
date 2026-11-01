@@ -82,7 +82,15 @@ describe("Información", () => {
   it("los botones del índice miden al menos 48 px de alto en CSS (clase btn)", () => {
     render(<PantallaInfo />);
     const indice = screen.getByRole("navigation", { name: "En esta pantalla" });
-    expect(within(indice).getAllByRole("link")).toHaveLength(5);
+    const enlaces = within(indice).getAllByRole("link");
+    expect(enlaces).toHaveLength(5);
+    for (const enlace of enlaces) {
+      expect(enlace.className).toContain("btn");
+    }
+  });
+
+  it("los contactos oficiales enlazan WhatsApp y teléfono", () => {
+    render(<PantallaInfo />);
     const whatsapp = screen.getByRole("link", {
       name: /WhatsApp del Gobierno de Zapopan/,
     });

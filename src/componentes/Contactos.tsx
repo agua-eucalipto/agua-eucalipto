@@ -9,7 +9,11 @@ const t = comun.contactos;
 export function ContactosOficiales({ idTitulo }: { idTitulo?: string }) {
   return (
     <div class="contactos">
-      {idTitulo ? <h3 id={idTitulo}>{t.titulo}</h3> : null}
+      {idTitulo ? (
+        <h3 class="contactos__titulo" id={idTitulo}>
+          {t.titulo}
+        </h3>
+      ) : null}
       <p>{t.ayuda}</p>
       <ul class="lista">
         {t.enlaces.map((enlace) => {
