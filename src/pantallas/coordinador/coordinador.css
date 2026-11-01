@@ -1,0 +1,91 @@
+/* Panel de coordinación y su hoja impresa. Los teléfonos nunca se imprimen. */
+
+.coordinador-subtitulo {
+  font-size: var(--t-titulo-3);
+}
+.coordinador-opciones {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.coordinador-lateral {
+  margin-top: 0;
+}
+.coordinador-seccion {
+  margin-top: 0;
+}
+.filas .coordinador-telefono {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 600px) {
+  .filas .coordinador-telefono {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+.coordinador-telefono .btn {
+  white-space: nowrap;
+}
+.coordinador-telefono__numero {
+  white-space: nowrap;
+}
+.caseta__texto {
+  width: 100%;
+  font: inherit;
+  font-size: var(--t-chico);
+  padding: var(--e-3);
+  border: 2px solid var(--linea);
+  border-radius: var(--r-control);
+  resize: vertical;
+}
+.caseta .tabla th[scope="rowgroup"] {
+  white-space: nowrap;
+}
+.coordinador-impresion {
+  display: none;
+}
+
+@media print {
+  /* Solo la lista: fuera título de la pantalla, solicitudes y teléfonos. */
+  .contenido:has(.panel-coordinador) .titulo-pantalla,
+  .coordinador-lateral {
+    display: none !important;
+  }
+
+  .panel-coordinador.dos-columnas {
+    display: block;
+  }
+
+  .panel-coordinador .caseta {
+    box-shadow: none;
+    border: 0;
+    padding: 0;
+  }
+
+  .caseta .coordinador-subtitulo {
+    display: none;
+  }
+  .coordinador-impresion {
+    display: block;
+    margin-bottom: 8pt;
+  }
+  .coordinador-impresion__titulo {
+    font-size: 18pt;
+    font-weight: 700;
+  }
+
+  /* En papel siempre se ven todas las columnas elegidas. */
+  .caseta .solo-escritorio {
+    display: table-cell;
+  }
+  .caseta .solo-movil {
+    display: none;
+  }
+  .caseta .tabla {
+    width: 100%;
+  }
+  .panel-coordinador .caseta__total {
+    color: #000;
+    font-size: 14pt;
+    font-weight: 700;
+  }
+}

@@ -1,2 +1,76 @@
-/** Textos de la pantalla coordinador. */
-export const coordinador = {} as const;
+/** Textos de la pantalla de coordinación. */
+export const coordinador = {
+  cargando: "Cargando…",
+  fallo: "Algo no salió como esperábamos. ¿Lo intentas otra vez?",
+  caseta: {
+    titulo: "Lista para caseta",
+    columnasOpcionales: "Columnas opcionales",
+    incluirCanal: "Incluir canal",
+    incluirDias: "Incluir días que lleva",
+    imprimir: "Imprimir o guardar PDF",
+    copiar: "Copiar para WhatsApp",
+    copiado: "Copiado",
+    noCopiado:
+      "No pudimos copiar solos. Selecciona el texto de abajo y cópialo.",
+    nota: "Generar la lista no quema folios.",
+    ultima: (fecha: string) => `Última lista: ${fecha}.`,
+    sinUltima: "Todavía no se ha enviado ninguna lista.",
+    vacia: "Ahora no hay folios vigentes para la caseta.",
+    vistaPrevia: "Vista previa de la lista para caseta",
+    colCasa: "Casa",
+    colFolio: "Folio",
+    colCanal: "Canal",
+    colDias: "Días",
+    textoWhatsApp: "Texto para WhatsApp",
+    casa: (n: string) => `Casa ${n}`,
+    total: (casas: number, folios: number) =>
+      `Total: ${casas === 1 ? "1 casa" : `${casas} casas`}, ${folios === 1 ? "1 folio" : `${folios} folios`}`,
+    encabezadoWhatsApp: "*Agua Eucalipto · Folios vigentes*",
+    canalWhatsApp: "WhatsApp",
+    canalTelefono: "tel",
+    menosDeUnDia: "menos de un día",
+    unDia: "1 día",
+    dias: (n: number) => `${n} días`,
+  },
+  solicitudes: {
+    titulo: (n: number) => `Solicitudes (${n})`,
+    vacia: "No hay solicitudes pendientes.",
+    motivoTelefono: "teléfono nuevo",
+    motivoCasa: "casa fuera de la lista",
+    aprobar: "Aprobar",
+    rechazar: "Rechazar",
+    tituloAprobar: (texto: string) => `¿Aprobar a ${texto}?`,
+    descripcionAprobar:
+      "Escribe el número de la casa a la que quedará ligado este teléfono.",
+    campoCasa: "Número de casa",
+    ayudaCasa: "Por ejemplo: 10",
+    casaVacia: "Falta el número de casa.",
+    avisoExcepcion:
+      "Si la casa no está en la lista, se agregará como excepción.",
+    siAprobar: "Sí, aprobar",
+    tituloRechazar: (texto: string) => `¿Rechazar la solicitud de ${texto}?`,
+    descripcionRechazar: "Esa persona tendrá que pedir acceso otra vez.",
+    siRechazar: "Sí, rechazar",
+    cancelar: "No, regresar",
+    aprobada: "Listo. La solicitud quedó aprobada.",
+    rechazada: "Listo. La solicitud quedó rechazada.",
+    yaResuelta: "Otra persona ya resolvió esta solicitud.",
+  },
+  telefonos: {
+    titulo: "Teléfonos",
+    vacio: "Todavía no hay teléfonos registrados.",
+    sinCasa: "Sin casa",
+    coordinador: "Coordinación",
+    reiniciar: "Reiniciar teléfono",
+    tituloReiniciar: (casa: string | null) =>
+      casa === null
+        ? "¿Reiniciar este teléfono?"
+        : `¿Reiniciar el teléfono de la casa ${casa}?`,
+    descripcionReiniciar:
+      "La persona tendrá que volver a entrar y crear su PIN",
+    siReiniciar: "Sí, reiniciar",
+    cancelar: "No, regresar",
+    listo: "Listo. La persona deberá volver a entrar y crear su PIN.",
+    noEncontrado: "No encontramos ese teléfono.",
+  },
+} as const;
