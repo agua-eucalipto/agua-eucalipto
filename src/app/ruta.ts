@@ -40,3 +40,13 @@ export function iniciarNavegacion(): () => void {
   alCambiar();
   return () => window.removeEventListener("hashchange", alCambiar);
 }
+
+/** Vuelve a la pantalla inicial sin dejar una entrada más en el historial. */
+export function irAInicio(): void {
+  window.history.replaceState(
+    window.history.state,
+    "",
+    hashDeRuta(RUTA_INICIAL),
+  );
+  window.dispatchEvent(new Event("hashchange"));
+}

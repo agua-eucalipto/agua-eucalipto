@@ -53,7 +53,33 @@ function irA(v: Vista, reemplazar = false) {
     window.history.replaceState(window.history.state, "", hashDe(v));
     window.dispatchEvent(new Event("hashchange"));
   } else {
-    window.location.hash = hashDe(v);
+    // Se recuerda si la entrada anterior es la lista, para poder volver a ella
+    // con «Atrás» sin dejar una entrada repetida (ver `volverALista`).
+    const desdeLista = /^#pipas\/?$/.test(window.location.hash);
+    window.history.pushState({ desdeLista }, "", hashDe(v));
+    window.dispatchEvent(new Event("hashchange"));
+  }
+}
+
+/**
+ * Regresa a la lista. Si se llegó desde ella, retrocede en el historial; así
+ * después de cancelar un viaje no queda una entrada repetida que haga que el
+ * primer «Atrás» no cambie nada.
+ */
+let volviendo = false;
+function volverALista() {
+  // Cancelar y la lectura posterior (el viaje ya no existe) piden lo mismo;
+  // `history.back()` es asíncrono, así que la segunda petición no debe retroceder otra vez.
+  if (volviendo) return;
+  const estado = window.history.state as { desdeLista?: boolean } | null;
+  if (estado?.desdeLista) {
+    volviendo = true;
+    window.addEventListener("popstate", () => (volviendo = false), {
+      once: true,
+    });
+    window.history.back();
+  } else {
+    irA({ tipo: "lista" }, true);
   }
 }
 
@@ -126,7 +152,7 @@ export function PantallaPipas() {
   const idDeVista = "id" in vista ? vista.id : null;
   const falta = datos !== null && idDeVista !== null && !viajeDe(idDeVista);
   useEffect(() => {
-    if (falta) irA({ tipo: "lista" }, true);
+    if (falta) volverALista();
   }, [falta]);
 
   /**
@@ -294,7 +320,7 @@ export function PantallaPipas() {
           void desdeDialogo(
             async () => api.cancelar_viaje(viajeDialogo.id),
             () => pipas.exito.cancelado,
-            () => irA({ tipo: "lista" }, true),
+            volverALista,
           )
         }
         tomar={(acepta) =>

@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+import { resumenTitulo } from "../../../src/app/titulo";
 import {
   act,
   cleanup,
@@ -53,7 +54,9 @@ function escribir(texto: string) {
 describe("pantalla Folios SIAPA con la semilla (casa 7)", () => {
   it("muestra los folios vigentes, el resumen y el historial plegado", async () => {
     await pintar();
-    expect(screen.getByText(siapa.resumen("7", 3, 4))).toBeTruthy();
+    await waitFor(() =>
+      expect(resumenTitulo.value).toBe(siapa.resumen("7", 3, 4)),
+    );
     for (const c of ["SIAPAZAP20261001", "SIAPAZAP20260950", "116245001"]) {
       expect(tarjeta(c)).toBeTruthy();
     }
@@ -192,7 +195,7 @@ describe("pantalla Folios SIAPA con la semilla (casa 7)", () => {
     );
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     await waitFor(() =>
-      expect(screen.getByText(siapa.resumen("7", 0, 4))).toBeTruthy(),
+      expect(resumenTitulo.value).toBe(siapa.resumen("7", 0, 4)),
     );
     expect(screen.getByText(siapa.sinActivos)).toBeTruthy();
     expect(screen.getByText(siapa.anteriores(5))).toBeTruthy();
@@ -212,7 +215,7 @@ describe("pantalla Folios SIAPA con la semilla (casa 7)", () => {
       screen.getByRole("button", { name: siapa.surtieron.confirmar }),
     );
     await waitFor(() =>
-      expect(screen.getByText(siapa.resumen("7", 2, 4))).toBeTruthy(),
+      expect(resumenTitulo.value).toBe(siapa.resumen("7", 2, 4)),
     );
   });
 

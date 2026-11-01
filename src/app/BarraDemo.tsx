@@ -3,6 +3,7 @@ import { CATALOGO_DEMO } from "../api/memoria";
 import { Boton, Dialogo, Icono } from "../componentes";
 import { textos } from "../textos";
 import { fechaCorta } from "./formato";
+import { irAInicio } from "./ruta";
 import {
   adelantarUnDia,
   diasAdelantados,
@@ -62,6 +63,8 @@ export function BarraDemo() {
     setConfirmando(false);
     const r = await reiniciarDemo();
     setAviso(r.ok ? "" : demo.fallo);
+    // Lista para el siguiente visitante: pantalla inicial, no la que se dejó.
+    if (r.ok) irAInicio();
   };
 
   return (

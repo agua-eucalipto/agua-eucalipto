@@ -155,3 +155,8 @@
     animation: none;
   }
 }
+
+/* El título recibe el foco cuando la capa no tiene controles; no es un control. */
+.capa__titulo:focus {
+  outline: none;
+}

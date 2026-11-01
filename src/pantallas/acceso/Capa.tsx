@@ -48,6 +48,12 @@ export function Capa({
       );
     };
     medir();
+    // La barra del demo cambia de alto al plegarse o abrirse: la capa la sigue.
+    const observador =
+      barra && typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(medir)
+        : null;
+    if (barra) observador?.observe(barra);
     window.addEventListener("resize", medir);
     window.addEventListener("scroll", medir, { passive: true });
 
@@ -82,6 +88,7 @@ export function Capa({
 
     return () => {
       document.removeEventListener("keydown", alTeclear);
+      observador?.disconnect();
       window.removeEventListener("resize", medir);
       window.removeEventListener("scroll", medir);
       for (const el of inertes) el.removeAttribute("inert");
@@ -94,7 +101,9 @@ export function Capa({
     if (!dentro || dentro.contains(document.activeElement)) return;
     const inicial =
       dentro.querySelector<HTMLElement>("[data-foco-inicial]") ??
-      dentro.querySelector<HTMLElement>(FOCALIZABLES);
+      dentro.querySelector<HTMLElement>(FOCALIZABLES) ??
+      // Sin nada que tocar (p. ej. «Solicitud enviada»), el foco va al título.
+      dentro.querySelector<HTMLElement>(".capa__titulo");
     inicial?.focus({ preventScroll: true });
   });
 
@@ -110,7 +119,7 @@ export function Capa({
         <div class="capa__marca" aria-hidden="true">
           <span class="marca__nombre">{comun.marca.nombre}</span>
         </div>
-        <h2 class="capa__titulo" id={idTitulo}>
+        <h2 class="capa__titulo" id={idTitulo} tabIndex={-1}>
           {titulo}
         </h2>
         {children}
