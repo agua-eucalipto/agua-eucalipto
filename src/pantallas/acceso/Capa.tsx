@@ -48,6 +48,12 @@ export function Capa({
       );
     };
     medir();
+    // La barra del demo cambia de alto al plegarse o abrirse: la capa la sigue.
+    const observador =
+      barra && typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(medir)
+        : null;
+    if (barra) observador?.observe(barra);
     window.addEventListener("resize", medir);
     window.addEventListener("scroll", medir, { passive: true });
 
@@ -82,6 +88,7 @@ export function Capa({
 
     return () => {
       document.removeEventListener("keydown", alTeclear);
+      observador?.disconnect();
       window.removeEventListener("resize", medir);
       window.removeEventListener("scroll", medir);
       for (const el of inertes) el.removeAttribute("inert");

@@ -66,10 +66,21 @@ function irA(v: Vista, reemplazar = false) {
  * después de cancelar un viaje no queda una entrada repetida que haga que el
  * primer «Atrás» no cambie nada.
  */
+let volviendo = false;
 function volverALista() {
+  // Cancelar y la lectura posterior (el viaje ya no existe) piden lo mismo;
+  // `history.back()` es asíncrono, así que la segunda petición no debe retroceder otra vez.
+  if (volviendo) return;
   const estado = window.history.state as { desdeLista?: boolean } | null;
-  if (estado?.desdeLista) window.history.back();
-  else irA({ tipo: "lista" }, true);
+  if (estado?.desdeLista) {
+    volviendo = true;
+    window.addEventListener("popstate", () => (volviendo = false), {
+      once: true,
+    });
+    window.history.back();
+  } else {
+    irA({ tipo: "lista" }, true);
+  }
 }
 
 interface AvisoPantalla {
