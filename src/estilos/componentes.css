@@ -208,6 +208,10 @@
 .tarjeta .acciones .btn--secundario {
   flex: 1 1 auto;
 }
+.dos-columnas {
+  display: grid;
+  gap: var(--e-5);
+}
 .dos-columnas > .seccion,
 .seccion > .seccion:first-child {
   margin-top: 0;

@@ -5,14 +5,21 @@ export const RUTAS = ["siapa", "pipas", "coordinador", "info"] as const;
 export type Ruta = (typeof RUTAS)[number] | "sistema";
 export const RUTA_INICIAL: Ruta = "siapa";
 
-/** Lee la ruta de un hash tipo `#pipas`; `null` si no es una ruta conocida. */
+/**
+ * Lee la ruta de un hash tipo `#pipas` o `#pipas/12/editar`; `null` si no es
+ * una ruta conocida. Lo que va después de la primera `/` es la subruta.
+ */
 export function rutaDeHash(hash: string): Ruta | null {
-  const limpio = hash.replace(/^#\/?/, "");
-  if (limpio === "") return RUTA_INICIAL;
-  if (limpio === "sistema" && import.meta.env.DEV) return "sistema";
-  return (RUTAS as readonly string[]).includes(limpio)
-    ? (limpio as Ruta)
-    : null;
+  const [base = ""] = hash.replace(/^#\/?/, "").split("/");
+  if (base === "") return RUTA_INICIAL;
+  if (base === "sistema" && import.meta.env.DEV) return "sistema";
+  return (RUTAS as readonly string[]).includes(base) ? (base as Ruta) : null;
+}
+
+/** Subruta de un hash: `#pipas/12/editar` → `"12/editar"`; `""` si no hay. */
+export function subrutaDeHash(hash: string): string {
+  const partes = hash.replace(/^#\/?/, "").split("/");
+  return partes.slice(1).filter(Boolean).join("/");
 }
 
 export function hashDeRuta(ruta: Ruta): string {
@@ -21,10 +28,13 @@ export function hashDeRuta(ruta: Ruta): string {
 
 /** Ruta actual (o `null` si el hash no existe). Se actualiza con `hashchange`. */
 export const rutaActual = signal<Ruta | null>(rutaDeHash(window.location.hash));
+/** Subruta dentro de la pantalla actual (p. ej. el viaje abierto en Pipas). */
+export const subruta = signal<string>(subrutaDeHash(window.location.hash));
 
 export function iniciarNavegacion(): () => void {
   const alCambiar = () => {
     rutaActual.value = rutaDeHash(window.location.hash);
+    subruta.value = subrutaDeHash(window.location.hash);
   };
   window.addEventListener("hashchange", alCambiar);
   alCambiar();
