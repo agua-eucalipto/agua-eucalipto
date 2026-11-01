@@ -117,7 +117,12 @@ function Tarjeta({
 
 /** Pantalla de Folios SIAPA: solo muestra lo que devuelve la `Api`. */
 export function PantallaSiapa() {
-  const [folios, setFolios] = useState<FolioVista[] | null>(null);
+  // La lista lleva la sesión para la que se leyó: al cambiar de casa o de
+  // rol no se enseñan folios de otra sesión mientras llega la lectura nueva.
+  const [leidos, setLeidos] = useState<{
+    clave: string;
+    folios: FolioVista[];
+  } | null>(null);
   const [falla, setFalla] = useState(false);
   const [version, setVersion] = useState(0);
   const [abierto, setAbierto] = useState<Abierto>(null);
@@ -127,6 +132,8 @@ export function PantallaSiapa() {
   // de sesión se vuelve a pedir la lista sin recargar la página.
   const ahora = reloj.value;
   const { casa, rol } = sesion.value;
+  const clave = `${casa ?? ""}|${rol}`;
+  const folios = !falla && leidos?.clave === clave ? leidos.folios : null;
 
   useEffect(() => {
     let vivo = true;
@@ -135,13 +142,17 @@ export function PantallaSiapa() {
         const r = await api.listar_folios_casa();
         if (!vivo) return;
         if (r.ok) {
-          setFolios(r.datos);
+          setLeidos({ clave, folios: r.datos });
           setFalla(false);
         } else {
+          setLeidos(null);
           setFalla(true);
         }
       } catch {
-        if (vivo) setFalla(true);
+        if (vivo) {
+          setLeidos(null);
+          setFalla(true);
+        }
       }
     })();
     return () => {
@@ -157,6 +168,13 @@ export function PantallaSiapa() {
     setAbierto(null);
     setMensaje(texto);
     setVersion((v) => v + 1);
+    // Si el botón que abrió el diálogo ya no existe, el foco no se pierde.
+    window.setTimeout(() => {
+      const activo = document.activeElement;
+      if (!activo || activo === document.body) {
+        document.getElementById("registrar-folio")?.focus();
+      }
+    }, 50);
   };
 
   const lista = folios ?? [];
@@ -181,6 +199,7 @@ export function PantallaSiapa() {
         variante="primario"
         ancho
         icono="mas"
+        id="registrar-folio"
         onClick={() => {
           setMensaje("");
           setAbierto({ t: "registrar" });
@@ -206,7 +225,9 @@ export function PantallaSiapa() {
       ) : folios === null ? (
         <p class="pantalla-vacia">{comun.estados.cargando}</p>
       ) : vigentes.length === 0 ? (
-        <p class="pantalla-vacia">{siapa.vacio}</p>
+        <p class="pantalla-vacia">
+          {anteriores.length > 0 ? siapa.sinActivos : siapa.vacio}
+        </p>
       ) : null}
 
       {vigentes.length > 0 ? (

@@ -194,7 +194,7 @@ describe("pantalla Folios SIAPA con la semilla (casa 7)", () => {
     await waitFor(() =>
       expect(screen.getByText(siapa.resumen("7", 0, 4))).toBeTruthy(),
     );
-    expect(screen.getByText(siapa.vacio)).toBeTruthy();
+    expect(screen.getByText(siapa.sinActivos)).toBeTruthy();
     expect(screen.getByText(siapa.anteriores(5))).toBeTruthy();
   });
 
@@ -243,6 +243,54 @@ describe("pantalla Folios SIAPA con la semilla (casa 7)", () => {
       await verComo("vecino", "10");
     });
     await waitFor(() => expect(screen.getByText(siapa.vacio)).toBeTruthy());
+  });
+
+  it("no deja folios de la casa al pasar a otra calle", async () => {
+    await pintar();
+    expect(document.querySelectorAll("article").length).toBeGreaterThan(0);
+    await act(async () => {
+      await verComo("otra_calle");
+    });
+    await waitFor(() => expect(screen.getByText(siapa.noCargo)).toBeTruthy());
+    expect(document.querySelectorAll("article")).toHaveLength(0);
+    expect(screen.queryByText(siapa.avisoPermanente)).not.toBeNull();
+    expect(screen.queryByRole("button", { name: /Me surtieron/ })).toBeNull();
+  });
+
+  it("el foco queda en la primera opción tras el tope del canal", async () => {
+    await pintar();
+    await abrirRegistro();
+    escribir("SIAPAZAP30000001");
+    fireEvent.click(
+      screen.getByRole("button", { name: siapa.registro.confirmar }),
+    );
+    const [primera] = await screen.findAllByRole("button", {
+      name: /^Reemplazar SIAPAZAP/,
+    });
+    await waitFor(() => expect(document.activeElement).toBe(primera));
+    expect(screen.getByRole("dialog").contains(document.activeElement)).toBe(
+      true,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      siapa.eligeReemplazo.descripcion("whatsapp"),
+    );
+  });
+
+  it("al reemplazar con otro canal explica que debe ser del mismo", async () => {
+    await pintar();
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: `${siapa.acciones.reemplazar}, folio 116245001`,
+      }),
+    );
+    await screen.findByRole("dialog");
+    escribir("SIAPAZAP30000002");
+    fireEvent.click(
+      screen.getByRole("button", { name: siapa.reemplazo.confirmar }),
+    );
+    expect(
+      await screen.findByText(siapa.reemplazoOtroCanal("telefono")),
+    ).toBeTruthy();
   });
 });
 

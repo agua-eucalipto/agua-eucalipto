@@ -86,7 +86,11 @@ function CuerpoRegistro({
           setError(siapa.fallo);
         }
       } else {
-        setError(textoDeError(r.error));
+        setError(
+          r.error === "REEMPLAZO_INVALIDO" && reemplaza
+            ? siapa.reemplazoOtroCanal(reemplaza.canal)
+            : textoDeError(r.error),
+        );
       }
     } catch {
       setError(siapa.fallo);
@@ -96,6 +100,16 @@ function CuerpoRegistro({
   };
 
   const eligiendo = candidatos !== null && canalLleno !== null && !elegido;
+
+  // Al pasar a elegir, el campo se deshabilita y el foco se perdería: va a la
+  // primera opción.
+  useEffect(() => {
+    if (eligiendo) {
+      formulario.current
+        ?.querySelector<HTMLElement>("[data-foco-inicial]")
+        ?.focus();
+    }
+  }, [eligiendo]);
 
   return (
     <form ref={formulario} class="dialogo__cuerpo" onSubmit={enviar} noValidate>
@@ -115,13 +129,16 @@ function CuerpoRegistro({
       />
       {eligiendo && canalLleno ? (
         <>
-          <Aviso tono="atencion">
-            {siapa.eligeReemplazo.descripcion(canalLleno)}
-          </Aviso>
-          {candidatos.map((f) => (
+          <div role="alert">
+            <Aviso tono="atencion">
+              {siapa.eligeReemplazo.descripcion(canalLleno)}
+            </Aviso>
+          </div>
+          {candidatos.map((f, i) => (
             <Boton
               key={f.id}
               ancho
+              focoInicial={i === 0}
               onClick={() => setElegido(f)}
               aria-label={siapa.eligeReemplazo.opcion(f.codigo)}
             >

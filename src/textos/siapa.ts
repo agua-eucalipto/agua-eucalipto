@@ -8,6 +8,8 @@ export const siapa = {
   listaActivos: "Folios activos",
   vacio:
     "Todavía no has registrado folios. Toca «Registrar folio» para empezar.",
+  sinActivos:
+    "No tienes folios activos. Toca «Registrar folio» si necesitas uno nuevo.",
   cargando: "Cargando tus folios…",
   noCargo: "No pudimos cargar tus folios. ¿Lo intentas otra vez?",
   reintentar: "Intentar otra vez",
@@ -98,5 +100,8 @@ export const siapa = {
       "No encontramos este folio. Revisa la lista e intenta otra vez.",
   } as Partial<Record<CodigoError, string>>,
   /** `TOPE_CANAL` no es error aquí: abre la elección de reemplazo. */
+  /** Reemplazo desde la tarjeta con un folio nuevo de otro canal. */
+  reemplazoOtroCanal: (canal: Canal) =>
+    `Para reemplazarlo, el folio nuevo debe ser de ${canal === "whatsapp" ? "WhatsApp" : "teléfono"}, igual que el que quitas.`,
   fallo: "Algo no salió como esperábamos. ¿Lo intentas otra vez?",
 } as const;
