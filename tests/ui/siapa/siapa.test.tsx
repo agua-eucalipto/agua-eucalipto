@@ -55,12 +55,27 @@ describe("pantalla Folios SIAPA con la semilla (casa 7)", () => {
   it("muestra los folios vigentes, el resumen y el historial plegado", async () => {
     await pintar();
     await waitFor(() =>
-      expect(resumenTitulo.value).toBe(siapa.resumen("7", 3, 4)),
+      expect(resumenTitulo.value).toBe(siapa.resumen("7", 3, 6)),
     );
     for (const c of ["SIAPAZAP20261001", "SIAPAZAP20260950", "116245001"]) {
-      expect(tarjeta(c)).toBeTruthy();
+      const tarjetaFolio = tarjeta(c);
+      expect(tarjetaFolio).toBeTruthy();
     }
-    const resumen = screen.getByText(siapa.anteriores(2));
+    expect(
+      within(tarjeta("SIAPAZAP20261001")).getByText(siapa.canal.whatsapp),
+    ).toBeTruthy();
+    expect(
+      within(tarjeta("116245001")).getByText(siapa.canal.telefono),
+    ).toBeTruthy();
+    expect(
+      within(tarjeta("2402")).getByText(siapa.canal.ayuntamiento),
+    ).toBeTruthy();
+    expect(
+      within(tarjeta("SIAPAZAP20261001")).queryByRole("button", {
+        name: /No me surtieron/,
+      }),
+    ).toBeNull();
+    const resumen = screen.getByText(siapa.anteriores(3));
     expect(resumen.closest("details")?.hasAttribute("open")).toBe(false);
     expect(screen.getByText(siapa.avisoPermanente)).toBeTruthy();
   });
@@ -195,10 +210,11 @@ describe("pantalla Folios SIAPA con la semilla (casa 7)", () => {
     );
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     await waitFor(() =>
-      expect(resumenTitulo.value).toBe(siapa.resumen("7", 0, 4)),
+      expect(resumenTitulo.value).toBe(siapa.resumen("7", 0, 6)),
     );
-    expect(screen.getByText(siapa.sinActivos)).toBeTruthy();
-    expect(screen.getByText(siapa.anteriores(5))).toBeTruthy();
+    expect(screen.queryByText(siapa.sinActivos)).toBeNull();
+    expect(tarjeta("2402")).toBeTruthy();
+    expect(screen.getByText(siapa.anteriores(6))).toBeTruthy();
   });
 
   it("E-F08: sin la casilla solo cierra ese folio", async () => {
@@ -215,7 +231,7 @@ describe("pantalla Folios SIAPA con la semilla (casa 7)", () => {
       screen.getByRole("button", { name: siapa.surtieron.confirmar }),
     );
     await waitFor(() =>
-      expect(resumenTitulo.value).toBe(siapa.resumen("7", 2, 4)),
+      expect(resumenTitulo.value).toBe(siapa.resumen("7", 2, 6)),
     );
   });
 
@@ -305,23 +321,34 @@ describe("registro desde una casa sin folios (casa 10)", () => {
   it("E-F02: detecta el canal mientras se escribe", async () => {
     await pintar();
     await abrirRegistro();
-    expect(
-      screen.queryByText(siapa.registro.canalDetectado("whatsapp")),
-    ).toBeNull();
+    expect(document.querySelector(".campo__ok")).toBeNull();
     escribir("siapazap");
-    expect(
-      await screen.findByText(siapa.registro.canalDetectado("whatsapp")),
-    ).toBeTruthy();
+    expect(document.querySelector(".campo__ok")?.textContent).toContain(
+      siapa.registro.canalDetectado("whatsapp"),
+    );
     escribir("1162");
+    expect(document.querySelector(".campo__ok")?.textContent).toContain(
+      siapa.registro.canalDetectado("ayuntamiento"),
+    );
+    escribir("11625");
+    expect(document.querySelector(".campo__ok")?.textContent).toContain(
+      siapa.registro.canalDetectado("telefono"),
+    );
+    escribir("2408");
+    expect(document.querySelector(".campo__ok")?.textContent).toContain(
+      siapa.registro.canalDetectado("ayuntamiento"),
+    );
     expect(
-      await screen.findByText(siapa.registro.canalDetectado("telefono")),
-    ).toBeTruthy();
+      within(screen.getByRole("dialog")).getByRole("link", {
+        name: /WhatsApp del Gobierno de Zapopan/,
+      }),
+    ).toHaveProperty("href", expect.stringContaining("wa.me/523338182222"));
   });
 
   it("E-F02: formatos inválidos muestran el texto de la Api", async () => {
     await pintar();
     await abrirRegistro();
-    for (const malo of ["ABC123", "SIAPAZAP", "1162"]) {
+    for (const malo of ["ABC123", "SIAPAZAP", "11621", "12345"]) {
       escribir(malo);
       fireEvent.click(
         screen.getByRole("button", { name: siapa.registro.confirmar }),
@@ -364,5 +391,41 @@ describe("registro desde una casa sin folios (casa 10)", () => {
     );
     const t = await screen.findByLabelText(`Folio ${largo}`);
     expect(within(t).getByText(largo)).toBeTruthy();
+  });
+});
+
+describe("folio vencido de la casa 4", () => {
+  beforeEach(async () => {
+    await verComo("vecino", "4");
+  });
+
+  it("F-12: «No me surtieron» lo pasa a anteriores y el código sigue bloqueado", async () => {
+    await pintar();
+    const codigo = "SIAPAZAP20260980";
+    const vigente = within(tarjeta(codigo));
+    expect(vigente.getByText(siapa.insignia.vencio)).toBeTruthy();
+    fireEvent.click(
+      vigente.getByRole("button", {
+        name: `${siapa.acciones.sinSurtir}, folio ${codigo}`,
+      }),
+    );
+    const dialogo = await screen.findByRole("dialog");
+    expect(within(dialogo).getByText(/Lo quitaremos de la lista/)).toBeTruthy();
+    fireEvent.click(
+      within(dialogo).getByRole("button", { name: siapa.sinSurtir.confirmar }),
+    );
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(screen.getByText(siapa.hecho.sinSurtir)).toBeTruthy();
+    fireEvent.click(await screen.findByText(siapa.anteriores(1)));
+    const cerrado = within(await screen.findByLabelText(`Folio ${codigo}`));
+    expect(cerrado.getByText(siapa.insignia.cerradoSinSurtir)).toBeTruthy();
+    expect(cerrado.getByText(/Cerrado el/)).toBeTruthy();
+
+    await abrirRegistro();
+    escribir(codigo);
+    fireEvent.click(
+      screen.getByRole("button", { name: siapa.registro.confirmar }),
+    );
+    expect(await screen.findByText(siapa.errores.FOLIO_YA_USADO!)).toBeTruthy();
   });
 });

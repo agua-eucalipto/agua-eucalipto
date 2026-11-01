@@ -1,6 +1,12 @@
 /** Textos de la pantalla de Folios SIAPA. */
 import type { Canal, CodigoError } from "../api";
 
+const NOMBRE_CANAL: Record<Canal, string> = {
+  whatsapp: "WhatsApp del SIAPA",
+  telefono: "Teléfono del SIAPA",
+  ayuntamiento: "Ayuntamiento de Zapopan",
+};
+
 export const siapa = {
   resumen: (casa: string, activos: number, tope: number) =>
     `Casa ${casa} · ${activos} ${activos === 1 ? "activo" : "activos"} de ${tope}`,
@@ -16,44 +22,44 @@ export const siapa = {
   anteriores: (n: number) => `Folios anteriores (${n})`,
   avisoPermanente:
     "Tus folios vencen solos a los 3 días. La página no manda avisos: revisa aquí. Así se diseñó para que la lista esté siempre al día.",
-  canal: { whatsapp: "WhatsApp", telefono: "Teléfono" } as Record<
-    Canal,
-    string
-  >,
+  canal: NOMBRE_CANAL,
   insignia: {
     activo: "Activo",
     venceHoy: "Vence hoy",
     vencio: "Venció",
     surtido: "Surtido",
     reemplazado: "Reemplazado",
+    cerradoSinSurtir: "Cerrado sin surtir",
   },
   lleva: (n: number) =>
     n < 1 ? "Lleva menos de un día" : `Lleva ${n} ${n === 1 ? "día" : "días"}`,
   registradoEl: (fecha: string) => `Registrado el ${fecha}`,
   surtidoEl: (fecha: string) => `Surtido el ${fecha}`,
   reemplazadoEl: (fecha: string) => `Reemplazado el ${fecha}`,
+  cerradoEl: (fecha: string) => `Cerrado el ${fecha}`,
   enviadoCaseta: (fecha: string) => `Enviado a caseta el ${fecha}`,
   extendido: (fecha: string) =>
     `Ya le diste más tiempo una vez. Vigente hasta el ${fecha}.`,
   enSuLugar: (codigo: string) => `En su lugar quedó ${codigo}`,
   acciones: {
     surtieron: "Me surtieron",
+    sinSurtir: "No me surtieron",
     pendiente: "Sigue pendiente",
     reemplazar: "Reemplazar por uno nuevo",
   },
   registro: {
     titulo: "Registrar folio",
     etiqueta: "Folio",
-    ayuda: "Empieza con SIAPAZAP (WhatsApp) o con 1162 (teléfono).",
+    ayuda:
+      "SIAPAZAP es WhatsApp del SIAPA. 1162 es teléfono. 4 dígitos, Ayuntamiento.",
     /** El campo agrega la palomita. */
-    canalDetectado: (canal: Canal) =>
-      canal === "whatsapp" ? "WhatsApp" : "Teléfono",
+    canalDetectado: (canal: Canal) => NOMBRE_CANAL[canal],
     confirmar: "Registrar",
     regresar: "No, regresar",
   },
   eligeReemplazo: {
     descripcion: (canal: Canal) =>
-      `Ya tienes 2 folios de ${canal === "whatsapp" ? "WhatsApp" : "teléfono"} activos. ¿Cuál reemplaza este nuevo?`,
+      `Ya tienes 2 folios de ${NOMBRE_CANAL[canal]} activos. ¿Cuál reemplaza este nuevo?`,
     opcion: (codigo: string) => `Reemplazar ${codigo}`,
   },
   reemplazo: {
@@ -69,6 +75,12 @@ export const siapa = {
       `Quitar también mis otros folios activos (${n})`,
     confirmar: "Sí, me surtieron",
   },
+  sinSurtir: {
+    titulo: "¿No te surtieron?",
+    descripcion:
+      "Lo quitaremos de la lista. Este folio no se puede usar otra vez.",
+    confirmar: "Sí, no me surtieron",
+  },
   pendiente: {
     titulo: "¿Sigue pendiente?",
     descripcion: (fecha: string) =>
@@ -79,11 +91,14 @@ export const siapa = {
     registrado: (codigo: string) => `Listo, registramos el folio ${codigo}.`,
     reemplazado: (codigo: string) => `Listo, ${codigo} quedó en su lugar.`,
     surtido: "Listo, quitamos el folio de la lista.",
+    sinSurtir: "Listo, cerramos el folio sin surtir.",
     pendiente: "Listo, le diste más tiempo al folio.",
   },
   errores: {
     FOLIO_FORMATO_INVALIDO:
-      "Revisa el folio: debe empezar con SIAPAZAP (WhatsApp) o con 1162 (teléfono).",
+      "Revisa el folio: SIAPAZAP, 1162 y más dígitos, o exactamente 4 dígitos.",
+    FOLIO_NO_VENCIDO:
+      "Este folio todavía está vigente. Si ya te surtieron, usa «Me surtieron».",
     FOLIO_YA_USADO:
       "Este folio ya se había registrado, por eso no se puede usar otra vez.",
     YA_EXTENDIDO:
@@ -102,6 +117,6 @@ export const siapa = {
   /** `TOPE_CANAL` no es error aquí: abre la elección de reemplazo. */
   /** Reemplazo desde la tarjeta con un folio nuevo de otro canal. */
   reemplazoOtroCanal: (canal: Canal) =>
-    `Para reemplazarlo, el folio nuevo debe ser de ${canal === "whatsapp" ? "WhatsApp" : "teléfono"}, igual que el que quitas.`,
+    `Para reemplazarlo, el folio nuevo debe ser de ${NOMBRE_CANAL[canal]}, igual que el que quitas.`,
   fallo: "Algo no salió como esperábamos. ¿Lo intentas otra vez?",
 } as const;

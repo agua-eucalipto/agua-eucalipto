@@ -82,7 +82,18 @@ describe("Información", () => {
   it("los botones del índice miden al menos 48 px de alto en CSS (clase btn)", () => {
     render(<PantallaInfo />);
     const indice = screen.getByRole("navigation", { name: "En esta pantalla" });
-    expect(within(indice).getAllByRole("link")).toHaveLength(4);
+    expect(within(indice).getAllByRole("link")).toHaveLength(5);
+    const whatsapp = screen.getByRole("link", {
+      name: /WhatsApp del Gobierno de Zapopan/,
+    });
+    const telefono = screen.getByRole("link", { name: /Teléfono del SIAPA/ });
+    const siapaWa = screen.getByRole("link", { name: /WhatsApp del SIAPA/ });
+    expect(whatsapp.getAttribute("href")).toBe("https://wa.me/523338182222");
+    expect(telefono.getAttribute("href")).toBe("tel:+523336682482");
+    expect(siapaWa.getAttribute("href")).toBe("https://wa.me/523351644440");
+    for (const enlace of [whatsapp, telefono, siapaWa]) {
+      expect(enlace.className).toContain("btn");
+    }
   });
 });
 
@@ -129,6 +140,7 @@ describe("AC-03 · la bitácora nunca muestra un folio completo ni un teléfono"
   it("aunque la Api entregara un folio completo o un teléfono, no llegan a la pantalla", () => {
     expect(proteger("SIAPAZAP20261001")).toBe("SIAPAZAP••••1001");
     expect(proteger("1162123456")).toBe("1162••••3456");
+    expect(proteger("2402")).toBe("••••");
     expect(proteger("llamó al 55 0000 0007")).toBe("llamó al ••••");
     expect(proteger("+52 5500000007")).toBe("••••");
     const evento = {

@@ -139,10 +139,13 @@ function sobreViaje(
 const PASOS_FOLIOS: Paso[] = [
   registrar(-240, "7", "SIAPAZAP20260900"),
   surtir(-200, "7", "SIAPAZAP20260900"),
+  registrar(-160, "7", "2401"),
+  surtir(-150, "7", "2401"),
   registrar(-150, "21", "116244900"),
   registrar(-100, "7", "SIAPAZAP20260950"),
   registrar(-90, "7", "116244000"),
   registrar(-80, "4", "SIAPAZAP20260980"),
+  registrar(-80, "7", "2402"),
   registrar(-70, "22", "SIAPAZAP20260990"),
   registrar(-60, "3", "116245010"),
   registrar(-50, "7", "SIAPAZAP20261001"),

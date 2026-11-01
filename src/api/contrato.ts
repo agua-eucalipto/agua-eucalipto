@@ -36,6 +36,7 @@ export const CODIGOS_ERROR = [
   "YA_EXTENDIDO",
   "FUERA_DE_PLAZO",
   "FOLIO_CERRADO",
+  "FOLIO_NO_VENCIDO",
   // Pipas
   "DATOS_INVALIDOS",
   "FALTA_ACEPTAR",
@@ -66,9 +67,9 @@ export type Resultado<T> =
 // Valores comunes
 // ---------------------------------------------------------------------------
 
-export type Canal = "whatsapp" | "telefono";
+export type Canal = "whatsapp" | "telefono" | "ayuntamiento";
 
-export type CierreFolio = "surtido" | "reemplazado";
+export type CierreFolio = "surtido" | "reemplazado" | "cerrado_sin_surtir";
 
 /** Estado de un folio: el cierre guardado o, si no hay, el derivado del tiempo. */
 export type EstadoFolio = "activo" | "vencido" | CierreFolio;
@@ -311,6 +312,7 @@ export const TIPOS_EVENTO = [
   "folio_reemplazado",
   "folio_extendido",
   "folio_surtido",
+  "folio_cerrado_sin_surtir",
   "lista_caseta_generada",
   "viaje_abierto",
   "viaje_editado",
@@ -422,6 +424,13 @@ export interface Api {
     folio_id: string,
     quemar_otros: boolean,
   ): Promise<Resultado<FolioVista[]>>;
+
+  /**
+   * "No me surtieron" sobre un folio vencido: `cierre = 'cerrado_sin_surtir'`.
+   * El código sigue bloqueado. Errores: `NO_ENCONTRADO`, `FOLIO_CERRADO`,
+   * `FOLIO_NO_VENCIDO`.
+   */
+  marcar_sin_surtir(folio_id: string): Promise<Resultado<FolioVista>>;
 
   // Pipas
 

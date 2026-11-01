@@ -43,7 +43,7 @@ const FECHA_LISTA =
   /^(dom|lun|mar|mié|jue|vie|sáb) \d{1,2} (ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic) \d{4}, \d{1,2}:\d{2}$/;
 
 const LINEA_CASA =
-  /^Casa \d+: (?:SIAPAZAP\d+|1162\d+) \((?:WhatsApp|tel), [^)]+\)(?:, (?:SIAPAZAP\d+|1162\d+) \((?:WhatsApp|tel), [^)]+\))*$/;
+  /^Casa \d+: (?:SIAPAZAP\d+|1162\d+|\d{4}) \((?:WhatsApp|tel|Ayuntamiento), [^)]+\)(?:, (?:SIAPAZAP\d+|1162\d+|\d{4}) \((?:WhatsApp|tel|Ayuntamiento), [^)]+\))*$/;
 
 export function demo(page: Page): Locator {
   return page.getByRole("region", { name: "Controles del demo" });
@@ -344,6 +344,9 @@ export async function medir(page: Page): Promise<Medicion> {
       "folios del SIAPA",
       "Folios del SIAPA",
       "Registra tus folios del SIAPA",
+      "WhatsApp del SIAPA",
+      "Teléfono del SIAPA",
+      "teléfono del SIAPA",
     ]) {
       resto = resto.split(frase).join("");
     }

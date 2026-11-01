@@ -55,6 +55,7 @@ export const METODOS_API = [
   "registrar_folio",
   "marcar_sigue_pendiente",
   "marcar_surtido",
+  "marcar_sin_surtir",
   "listar_viajes",
   "listar_espera",
   "abrir_viaje",

@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { Canal, CodigoError, FolioVista } from "../../api";
-import { Aviso, Boton, CampoGrande, Casilla, Dialogo } from "../../componentes";
+import {
+  Aviso,
+  Boton,
+  CampoGrande,
+  Casilla,
+  ContactosOficiales,
+  Dialogo,
+} from "../../componentes";
 import { VIGENCIA_MAXIMA_FOLIO_MS } from "../../dominio";
 import { api } from "../../app/servicios";
 import { fechaCorta } from "../../app/formato";
@@ -166,6 +173,7 @@ function CuerpoRegistro({
       <Boton variante="texto" ancho onClick={onCerrar}>
         {siapa.registro.regresar}
       </Boton>
+      <ContactosOficiales idTitulo="contactos-registro" />
     </form>
   );
 }
@@ -220,6 +228,55 @@ function CuerpoSurtido({
       {error ? <Aviso tono="error">{error}</Aviso> : null}
       <Boton variante="primario" ancho focoInicial onClick={confirmar}>
         {siapa.surtieron.confirmar}
+      </Boton>
+      <Boton variante="texto" ancho onClick={onCerrar}>
+        {siapa.registro.regresar}
+      </Boton>
+    </>
+  );
+}
+
+/** "No me surtieron": cierra un folio vencido. El código sigue bloqueado. */
+export function DialogoSinSurtir(p: Cierre & { folio: FolioVista }) {
+  return (
+    <Dialogo
+      titulo={siapa.sinSurtir.titulo}
+      descripcion={`${p.folio.codigo}. ${siapa.sinSurtir.descripcion}`}
+      onCerrar={p.onCerrar}
+    >
+      <CuerpoSinSurtir {...p} />
+    </Dialogo>
+  );
+}
+
+function CuerpoSinSurtir({
+  folio,
+  onCerrar,
+  onHecho,
+}: Cierre & { folio: FolioVista }) {
+  const [error, setError] = useState("");
+  const ocupado = useRef(false);
+
+  const confirmar = async () => {
+    if (ocupado.current) return;
+    ocupado.current = true;
+    setError("");
+    try {
+      const r = await api.marcar_sin_surtir(folio.id);
+      if (r.ok) onHecho(siapa.hecho.sinSurtir);
+      else setError(textoDeError(r.error));
+    } catch {
+      setError(siapa.fallo);
+    } finally {
+      ocupado.current = false;
+    }
+  };
+
+  return (
+    <>
+      {error ? <Aviso tono="error">{error}</Aviso> : null}
+      <Boton variante="primario" ancho focoInicial onClick={confirmar}>
+        {siapa.sinSurtir.confirmar}
       </Boton>
       <Boton variante="texto" ancho onClick={onCerrar}>
         {siapa.registro.regresar}

@@ -23,5 +23,7 @@ export const VENTANA_VIAJES_TERMINADOS_MS = 4 * DIA_MS;
 
 export const PATRON_FOLIO_WHATSAPP = /^SIAPAZAP\d{4,}$/;
 export const PATRON_FOLIO_TELEFONO = /^1162\d{4,}$/;
+/** Ayuntamiento de Zapopan: exactamente 4 dígitos. `1162` solo entra aquí. */
+export const PATRON_FOLIO_AYUNTAMIENTO = /^\d{4}$/;
 
 export const LONGITUD_TELEFONO = 10;

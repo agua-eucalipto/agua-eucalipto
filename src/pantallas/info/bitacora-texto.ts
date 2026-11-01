@@ -18,7 +18,8 @@ export function proteger(texto: string): string {
     .replace(FOLIO_COMPLETO, (_t, prefijo: string, resto: string) => {
       return `${prefijo.toUpperCase()}••••${resto.slice(-4)}`;
     })
-    .replace(TELEFONO, "••••");
+    .replace(TELEFONO, "••••")
+    .replace(/(?<!•)\b\d{4}\b(?!•)/g, "••••");
 }
 
 function cadena(valor: unknown): string {
@@ -26,7 +27,14 @@ function cadena(valor: unknown): string {
 }
 
 function canal(valor: unknown): string {
-  return valor === "whatsapp" || valor === "telefono" ? b.canal[valor] : "";
+  if (
+    valor === "whatsapp" ||
+    valor === "telefono" ||
+    valor === "ayuntamiento"
+  ) {
+    return b.canal[valor];
+  }
+  return "";
 }
 
 /** Quién hizo el movimiento: «Casa 7», «Coordinación (casa 3)» o «El sistema». */
@@ -52,6 +60,8 @@ export function queHizo(e: EventoVista): string {
       return b.eventos.folio_extendido(cadena(d.folio));
     case "folio_surtido":
       return b.eventos.folio_surtido(cadena(d.folio));
+    case "folio_cerrado_sin_surtir":
+      return b.eventos.folio_cerrado_sin_surtir(cadena(d.folio));
     case "entrega_confirmada":
       return b.eventos.entrega_confirmada(cadena(d.resultado));
     default: {

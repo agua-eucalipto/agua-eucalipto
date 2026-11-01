@@ -50,11 +50,23 @@ describe("F-02 clasificarFolio", () => {
     });
   });
 
+  it("detecta el Ayuntamiento cuando hay exactamente 4 dígitos", () => {
+    expect(clasificarFolio("12 34")).toEqual({
+      codigo: "1234",
+      canal: "ayuntamiento",
+    });
+    expect(clasificarFolio("1162")).toEqual({
+      codigo: "1162",
+      canal: "ayuntamiento",
+    });
+  });
+
   it.each([
     ["", "vacío"],
     ["ABC12345", "prefijo desconocido"],
     ["SIAPAZAP123", "menos de 4 dígitos"],
     ["1162123", "menos de 4 dígitos en teléfono"],
+    ["12345", "cinco dígitos"],
     ["SIAPAZAP12A45", "letras entre los dígitos"],
     ["XSIAPAZAP12345", "texto antes del prefijo"],
   ])("rechaza %j (%s)", (codigo) => {
@@ -97,6 +109,9 @@ describe("estadoFolio", () => {
     expect(
       estadoFolio(folio({ cierre: "reemplazado" }), REGISTRO + 500 * HORA_MS),
     ).toBe("reemplazado");
+    expect(
+      estadoFolio(folio({ cierre: "cerrado_sin_surtir" }), REGISTRO + HORA_MS),
+    ).toBe("cerrado_sin_surtir");
   });
 });
 
@@ -142,6 +157,9 @@ describe("F-07 e I-01 puedeExtender", () => {
     );
     expect(
       puedeExtender(folio({ cierre: "reemplazado" }), REGISTRO + DIA_MS),
+    ).toBe(false);
+    expect(
+      puedeExtender(folio({ cierre: "cerrado_sin_surtir" }), REGISTRO + DIA_MS),
     ).toBe(false);
   });
 });

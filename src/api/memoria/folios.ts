@@ -132,7 +132,10 @@ export function marcarSiguePendiente(
   return exito(folioVista(tx.estado, folio, tx.ahora));
 }
 
-/** F-08: "me surtieron", con la opción de cerrar los demás activos de la casa. */
+/**
+ * F-08: "me surtieron". Con `quemarOtros`, cierra los demás activos de la
+ * casa, de cualquier canal.
+ */
 export function marcarSurtido(
   tx: Transaccion,
   folioId: string,
@@ -166,4 +169,31 @@ export function marcarSurtido(
     });
   }
   return exito(cambiados.map((f) => folioVista(tx.estado, f, tx.ahora)));
+}
+
+/** F-12: "no me surtieron" solo cierra un folio ya vencido. */
+export function marcarSinSurtir(
+  tx: Transaccion,
+  folioId: string,
+): Resultado<FolioVista> {
+  const casa = tx.casa();
+  if (casa === null) {
+    return falla("NO_AUTORIZADO");
+  }
+  const folio = folioDeLaCasa(tx, casa, folioId);
+  if (folio === undefined) {
+    return falla("NO_ENCONTRADO");
+  }
+  if (folio.cierre !== null) {
+    return falla("FOLIO_CERRADO");
+  }
+  if (estadoFolio(folio, tx.ahora) !== "vencido") {
+    return falla("FOLIO_NO_VENCIDO");
+  }
+  cerrar(tx, folio, "cerrado_sin_surtir");
+  tx.evento("folio_cerrado_sin_surtir", {
+    folio_id: folio.id,
+    folio: enmascararFolio(folio.codigo),
+  });
+  return exito(folioVista(tx.estado, folio, tx.ahora));
 }

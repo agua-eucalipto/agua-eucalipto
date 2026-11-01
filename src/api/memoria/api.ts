@@ -123,6 +123,10 @@ export class ApiMemoria implements Api, ApiDemo {
     );
   }
 
+  marcar_sin_surtir(folio_id: string) {
+    return this.#escribir((tx) => folios.marcarSinSurtir(tx, folio_id));
+  }
+
   // Pipas
 
   listar_viajes() {

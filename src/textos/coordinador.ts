@@ -28,6 +28,7 @@ export const coordinador = {
     encabezadoWhatsApp: "*Agua Eucalipto · Folios vigentes*",
     canalWhatsApp: "WhatsApp",
     canalTelefono: "tel",
+    canalAyuntamiento: "Ayuntamiento",
     menosDeUnDia: "menos de un día",
     unDia: "1 día",
     dias: (n: number) => `${n} días`,

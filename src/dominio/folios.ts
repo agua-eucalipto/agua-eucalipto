@@ -1,6 +1,7 @@
 import {
   AVISO_VENCE_HOY_MS,
   DIA_MS,
+  PATRON_FOLIO_AYUNTAMIENTO,
   PATRON_FOLIO_TELEFONO,
   PATRON_FOLIO_WHATSAPP,
   VIGENCIA_FOLIO_MS,
@@ -23,6 +24,9 @@ export function clasificarFolio(
   }
   if (PATRON_FOLIO_TELEFONO.test(normalizado)) {
     return { codigo: normalizado, canal: "telefono" };
+  }
+  if (PATRON_FOLIO_AYUNTAMIENTO.test(normalizado)) {
+    return { codigo: normalizado, canal: "ayuntamiento" };
   }
   return null;
 }

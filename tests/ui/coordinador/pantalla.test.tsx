@@ -29,7 +29,13 @@ function esperadoDe07(l: ListaCaseta): string {
       f.folios
         .map(
           (x) =>
-            `${x.codigo} (${x.canal === "telefono" ? "tel" : "WhatsApp"}, ${dias(x.dias_que_lleva)})`,
+            `${x.codigo} (${
+              x.canal === "telefono"
+                ? "tel"
+                : x.canal === "ayuntamiento"
+                  ? "Ayuntamiento"
+                  : "WhatsApp"
+            }, ${dias(x.dias_que_lleva)})`,
         )
         .join(", "),
   );

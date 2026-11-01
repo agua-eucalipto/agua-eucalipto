@@ -4,6 +4,7 @@ import {
   DIA,
   HORA,
   MIN,
+  ay,
   conEventos,
   folioDe,
   foliosDe,
@@ -72,16 +73,17 @@ escenario(
 );
 
 escenario(
-  "F-02 · el prefijo decide el canal y el resto es inválido",
+  "F-02 · el formato decide el canal y el resto es inválido",
   async (c) => {
     const { api, como } = c;
     await como("7");
     for (const invalido of [
       "ABC123",
       "SIAPAZAP",
-      "1162",
+      "11621",
       "SIAPAZAP123",
       "1162123",
+      "12345",
       "SIAPAZAP12AB",
       "",
     ]) {
@@ -95,31 +97,44 @@ escenario(
 
     const whatsapp = await registrar(c, "7", "siapazap-2026.0001");
     const telefono = await registrar(c, "7", "1162 4500-1");
+    const ayuntamiento = await registrar(c, "7", "12-34");
     expect(whatsapp).toMatchObject({
       codigo: "SIAPAZAP20260001",
       canal: "whatsapp",
     });
     expect(telefono).toMatchObject({ codigo: "116245001", canal: "telefono" });
+    expect(ayuntamiento).toMatchObject({
+      codigo: "1234",
+      canal: "ayuntamiento",
+    });
   },
 );
 
-escenario("F-03 · tope de 2 activos por canal", async (c) => {
+escenario("F-03 · tope de 2 activos por canal y 6 por casa", async (c) => {
   const { api, como } = c;
   const w1 = await registrar(c, "7", wa(1));
   await registrar(c, "7", wa(2));
   await registrar(c, "7", tel(1));
   await registrar(c, "7", tel(2));
+  await registrar(c, "7", ay(1));
+  await registrar(c, "7", ay(2));
 
   await como("7");
   rechaza(await api.registrar_folio(wa(3)), "TOPE_CANAL", "3.º de WhatsApp");
   rechaza(await api.registrar_folio(tel(3)), "TOPE_CANAL", "3.º de teléfono");
+  rechaza(
+    await api.registrar_folio(ay(3)),
+    "TOPE_CANAL",
+    "3.º de Ayuntamiento",
+  );
 
   const folios = await foliosDe(c, "7");
-  const activosWa = folios.filter(
-    (f) => f.canal === "whatsapp" && f.estado === "activo",
-  );
-  expect(activosWa.map((f) => f.codigo).sort()).toEqual([wa(1), wa(2)]);
-  expect(folios).toHaveLength(4);
+  for (const canal of ["whatsapp", "telefono", "ayuntamiento"] as const) {
+    expect(
+      folios.filter((f) => f.canal === canal && f.estado === "activo"),
+    ).toHaveLength(2);
+  }
+  expect(folios).toHaveLength(6);
 
   // El código rechazado no quedó bloqueado: se puede usar reemplazando.
   const nuevo = await registrar(c, "7", wa(3), w1.id);
@@ -351,6 +366,32 @@ escenario(
 );
 
 escenario(
+  "F-08 · quemar otros cierra activos de los tres canales",
+  async (c) => {
+    const { api, como } = c;
+    const w = await registrar(c, "7", wa(1));
+    const t = await registrar(c, "7", tel(1));
+    const a = await registrar(c, "7", ay(1));
+    await como("7");
+    const cambiados = ok(
+      await api.marcar_surtido(w.id, true),
+      "quemar los tres canales",
+    );
+    expect(cambiados.map((f) => f.id).sort()).toEqual(
+      [w.id, t.id, a.id].sort(),
+    );
+    expect(cambiados.map((f) => f.canal).sort()).toEqual([
+      "ayuntamiento",
+      "telefono",
+      "whatsapp",
+    ]);
+    for (const f of cambiados) {
+      expect(f.estado).toBe("surtido");
+    }
+  },
+);
+
+escenario(
   "F-08 · sin quemar los otros solo cierra ese; también sirve un vencido",
   async (c) => {
     const { api, como, reloj } = c;
@@ -434,5 +475,78 @@ escenario(
       vence_hoy: false,
       puede_extender: true,
     });
+  },
+);
+
+escenario(
+  "F-12 · no me surtieron cierra el vencido, sale de caseta y bloquea el código",
+  async (c) => {
+    const { api, como, reloj } = c;
+    const vencido = await registrar(c, "7", ay(7));
+    await reloj.adelantar(73 * HORA);
+    const activo = await registrar(c, "7", wa(1));
+    await como("7");
+    rechaza(
+      await api.marcar_sin_surtir(activo.id),
+      "FOLIO_NO_VENCIDO",
+      "folio todavía activo",
+    );
+
+    const eventos = await conEventos(api, async () => {
+      const cerrado = ok(
+        await api.marcar_sin_surtir(vencido.id),
+        "no me surtieron",
+      );
+      expect(cerrado).toMatchObject({
+        id: vencido.id,
+        estado: "cerrado_sin_surtir",
+        cierre: "cerrado_sin_surtir",
+        cerrado_at: reloj.ahora(),
+      });
+    });
+    expect(tipos(eventos)).toEqual(["folio_cerrado_sin_surtir"]);
+    expect(eventos[0]?.detalle.folio).toBe("••••");
+    expect(String(eventos[0]?.detalle.folio)).not.toContain(ay(7));
+
+    await como("coordinador");
+    const lista = ok(
+      await api.generar_lista_caseta({
+        canal: true,
+        dias: true,
+        formato: "imprimir",
+      }),
+      "lista para caseta",
+    );
+    const codigos = lista.filas.flatMap((f) => f.folios.map((x) => x.codigo));
+    expect(codigos).not.toContain(ay(7));
+    expect(codigos).toContain(wa(1));
+
+    await como("7");
+    rechaza(
+      await api.registrar_folio(ay(7)),
+      "FOLIO_YA_USADO",
+      "reutilizar el código cerrado",
+    );
+    rechaza(
+      await api.marcar_sin_surtir(vencido.id),
+      "FOLIO_CERRADO",
+      "ya cerrado sin surtir",
+    );
+    rechaza(
+      await api.marcar_surtido(vencido.id, false),
+      "FOLIO_CERRADO",
+      "me surtieron sobre cerrado sin surtir",
+    );
+    rechaza(
+      await api.marcar_sigue_pendiente(vencido.id),
+      "FOLIO_CERRADO",
+      "sigue pendiente sobre cerrado sin surtir",
+    );
+    await como("8");
+    rechaza(
+      await api.marcar_sin_surtir(vencido.id),
+      "NO_ENCONTRADO",
+      "folio de otra casa",
+    );
   },
 );
