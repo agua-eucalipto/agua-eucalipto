@@ -1,4 +1,4 @@
-import type { ListaCaseta, OpcionesListaCaseta } from "../../api";
+import type { ListaCaseta, OpcionesListaCaseta, Canal } from "../../api";
 import { coordinador } from "../../textos";
 
 const DIAS_SEMANA = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
@@ -32,8 +32,10 @@ export function diasTexto(dias: number): string {
   return dias === 1 ? t.unDia : t.dias(dias);
 }
 
-export function canalTexto(canal: "whatsapp" | "telefono"): string {
-  return canal === "telefono" ? t.canalTelefono : t.canalWhatsApp;
+export function canalTexto(canal: Canal): string {
+  if (canal === "telefono") return t.canalTelefono;
+  if (canal === "ayuntamiento") return t.canalAyuntamiento;
+  return t.canalWhatsApp;
 }
 
 /** "5500000003" → "55 0000 0003". Cualquier otra cosa se deja tal cual. */

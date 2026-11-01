@@ -29,6 +29,12 @@ test("adelantar tres días sigue la tabla y reiniciar vuelve a la semilla", asyn
     await expect(
       page.getByRole("article", { name: "Folio SIAPAZAP20261001" }),
     ).toContainText("Vence hoy");
+    await expect(
+      page.getByRole("article", { name: "Folio 2402" }),
+    ).toContainText("Ayuntamiento de Zapopan");
+    await expect(
+      page.getByRole("article", { name: "Folio 116245001" }),
+    ).toContainText("Teléfono del SIAPA");
     await verVecino(page, "3", "116245010");
     await expect(
       page.getByRole("article", { name: "Folio 116245010" }),
@@ -46,6 +52,8 @@ test("adelantar tres días sigue la tabla y reiniciar vuelve a la semilla", asyn
     expect(lista).toContain("116245010");
     expect(lista).not.toContain("SIAPAZAP20260980");
     expect(lista).not.toContain("116244900");
+    expect(lista).not.toContain("2402");
+    expect(lista).not.toContain("2401");
     expect(lista).toContain("Total: 5 casas, 9 folios");
 
     await irA(page, "Pipas privadas");

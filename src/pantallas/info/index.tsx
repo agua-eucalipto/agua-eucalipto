@@ -1,5 +1,5 @@
 import type { ComponentChildren } from "preact";
-import { Boton } from "../../componentes";
+import { Boton, ContactosOficiales } from "../../componentes";
 import { info } from "../../textos";
 import { verIntroduccionOtraVez } from "../acceso";
 import { Bitacora } from "./Bitacora";
@@ -58,6 +58,13 @@ export function PantallaInfo() {
         </a>
         <a
           class="btn btn--secundario"
+          href="#contactos-info"
+          onClick={irA("contactos-info")}
+        >
+          {t.secciones.contactos}
+        </a>
+        <a
+          class="btn btn--secundario"
           href="#reglas-info"
           onClick={irA("reglas-info")}
         >
@@ -93,6 +100,10 @@ export function PantallaInfo() {
           <p>{t.tutorial.texto}</p>
           <Boton onClick={verIntroduccionOtraVez}>{t.tutorial.boton}</Boton>
         </div>
+      </Seccion>
+
+      <Seccion id="contactos-info" titulo={t.secciones.contactos}>
+        <ContactosOficiales />
       </Seccion>
 
       <Seccion id="reglas-info" titulo={t.secciones.reglas}>

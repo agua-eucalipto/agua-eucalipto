@@ -1,6 +1,8 @@
-export type Canal = "whatsapp" | "telefono";
+export const CANALES = ["whatsapp", "telefono", "ayuntamiento"] as const;
 
-export type CierreFolio = "surtido" | "reemplazado";
+export type Canal = (typeof CANALES)[number];
+
+export type CierreFolio = "surtido" | "reemplazado" | "cerrado_sin_surtir";
 
 export type EstadoFolio = "activo" | "vencido" | CierreFolio;
 

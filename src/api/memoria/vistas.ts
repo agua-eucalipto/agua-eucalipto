@@ -39,8 +39,12 @@ import type {
 
 const PREFIJOS_FOLIO = ["SIAPAZAP", "1162"];
 
-/** `SIAPAZAP20261234` → `SIAPAZAP••••1234`. */
+/**
+ * `SIAPAZAP20261234` → `SIAPAZAP••••1234`.
+ * Un folio de 4 dígitos se tapa por completo: los últimos 4 serían el código.
+ */
 export function enmascararFolio(codigo: string): string {
+  if (/^\d{4}$/.test(codigo)) return "••••";
   const prefijo = PREFIJOS_FOLIO.find((p) => codigo.startsWith(p)) ?? "";
   return `${prefijo}••••${codigo.slice(-4)}`;
 }

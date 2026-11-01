@@ -2,6 +2,7 @@
 export const info = {
   secciones: {
     resumen: "Resumen",
+    contactos: "Contactos oficiales",
     reglas: "Reglas",
     bitacora: "Bitácora",
     privacidad: "Privacidad",
@@ -32,11 +33,12 @@ export const info = {
     folios: {
       titulo: "Folios del SIAPA",
       lista: [
-        "Un folio empieza con SIAPAZAP (WhatsApp) o con 1162 (teléfono).",
+        "Un folio es de WhatsApp del SIAPA (SIAPAZAP), de teléfono (1162) o del Ayuntamiento (4 dígitos).",
         "Un folio que ya se registró alguna vez no se puede usar otra vez.",
-        "Cada casa puede tener hasta 2 folios activos de WhatsApp y 2 de teléfono.",
+        "Cada casa puede tener hasta 2 folios activos por canal: 6 en total.",
         "Un folio dura 3 días. Si sigues sin agua, toca “Sigue pendiente” una sola vez y dura hasta 6 días.",
         "Con “Me surtieron” el folio se cierra. Por defecto también se cierran tus otros folios activos.",
+        "Si un folio venció y no te surtieron, toca “No me surtieron”. Se cierra y no se reutiliza.",
         "Si quieres cambiar un folio por uno nuevo, puedes reemplazarlo.",
         "Generar la lista para la caseta no cierra ningún folio.",
       ],
@@ -73,7 +75,11 @@ export const info = {
     minutos: (n: number) => `hace ${n} min`,
     horas: (n: number) => `hace ${n} h`,
     dias: (n: number) => `hace ${n} ${n === 1 ? "día" : "días"}`,
-    canal: { whatsapp: "WhatsApp", telefono: "teléfono" },
+    canal: {
+      whatsapp: "WhatsApp del SIAPA",
+      telefono: "teléfono del SIAPA",
+      ayuntamiento: "Ayuntamiento de Zapopan",
+    },
     eventos: {
       folio_registrado: (folio: string, canal: string) =>
         `registró un folio de ${canal}${folio ? ` (${folio})` : ""}`,
@@ -85,6 +91,8 @@ export const info = {
         `dio más tiempo a un folio${folio ? ` (${folio})` : ""}`,
       folio_surtido: (folio: string) =>
         `marcó un folio como surtido${folio ? ` (${folio})` : ""}`,
+      folio_cerrado_sin_surtir: (folio: string) =>
+        `cerró un folio sin que le surtieran${folio ? ` (${folio})` : ""}`,
       lista_caseta_generada: () => "generó la lista para la caseta",
       viaje_abierto: () => "abrió un viaje de pipa",
       viaje_editado: () => "cambió los datos de un viaje",

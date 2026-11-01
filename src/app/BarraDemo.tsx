@@ -7,6 +7,8 @@ import { irAInicio } from "./ruta";
 import {
   adelantarUnDia,
   diasAdelantados,
+  fijarAljibe,
+  mostrarAljibe,
   refrescarSesion,
   reiniciarDemo,
   reloj,
@@ -37,6 +39,7 @@ export function BarraDemo() {
   const casa = sesion.value.casa ?? "7";
   const dias = diasAdelantados();
   const perfil = perfilActual();
+  const aljibeActivo = mostrarAljibe.value;
 
   useEffect(() => {
     if (!aviso) return;
@@ -93,66 +96,78 @@ export function BarraDemo() {
           <Icono nombre="abajo" chico />
         </button>
         <div class="barra-demo__controles" id="controles-demo">
-          <div
-            class="barra-demo__ver-como"
-            role="group"
-            aria-label={demo.verComo}
-          >
-            <div class="barra-demo__opciones">
-              <button
-                class="btn-demo"
-                type="button"
-                aria-pressed={perfil === "vecino"}
-                onClick={() => cambiarPerfil("vecino", casa)}
-              >
-                {demo.vecino}
-              </button>
-              <button
-                class="btn-demo"
-                type="button"
-                aria-pressed={perfil === "coordinador"}
-                onClick={() => cambiarPerfil("coordinador")}
-              >
-                {demo.coordinador}
-              </button>
-              <button
-                class="btn-demo"
-                type="button"
-                aria-pressed={perfil === "otra_calle"}
-                onClick={() => cambiarPerfil("otra_calle")}
-              >
-                {demo.otraCalle}
-              </button>
-            </div>
-            {perfil === "vecino" ? (
-              <label class="barra-demo__casa">
-                {demo.casa}
-                <select
-                  value={casa}
-                  onChange={(e) => {
-                    const c = (e.currentTarget as HTMLSelectElement).value;
-                    void cambiarPerfil("vecino", c);
-                  }}
+          <div class="barra-demo__fila">
+            <div
+              class="barra-demo__ver-como"
+              role="group"
+              aria-label={demo.verComo}
+            >
+              <div class="barra-demo__opciones">
+                <button
+                  class="btn-demo"
+                  type="button"
+                  aria-pressed={perfil === "vecino"}
+                  onClick={() => cambiarPerfil("vecino", casa)}
                 >
-                  {CATALOGO_DEMO.casas.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
+                  {demo.vecino}
+                </button>
+                <button
+                  class="btn-demo"
+                  type="button"
+                  aria-pressed={perfil === "coordinador"}
+                  onClick={() => cambiarPerfil("coordinador")}
+                >
+                  {demo.coordinador}
+                </button>
+                <button
+                  class="btn-demo"
+                  type="button"
+                  aria-pressed={perfil === "otra_calle"}
+                  onClick={() => cambiarPerfil("otra_calle")}
+                >
+                  {demo.otraCalle}
+                </button>
+              </div>
+              {perfil === "vecino" ? (
+                <label class="barra-demo__casa">
+                  {demo.casa}
+                  <select
+                    value={casa}
+                    onChange={(e) => {
+                      const c = (e.currentTarget as HTMLSelectElement).value;
+                      void cambiarPerfil("vecino", c);
+                    }}
+                  >
+                    {CATALOGO_DEMO.casas.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+            </div>
+            <button class="btn-demo" type="button" onClick={adelantar}>
+              {demo.adelantar}
+            </button>
+            <button
+              class="btn-demo"
+              type="button"
+              onClick={() => setConfirmando(true)}
+            >
+              {demo.reiniciar}
+            </button>
           </div>
-          <button class="btn-demo" type="button" onClick={adelantar}>
-            {demo.adelantar}
-          </button>
-          <button
-            class="btn-demo"
-            type="button"
-            onClick={() => setConfirmando(true)}
-          >
-            {demo.reiniciar}
-          </button>
+          <label class="barra-demo__aljibe">
+            <input
+              type="checkbox"
+              checked={aljibeActivo}
+              onChange={(e) => {
+                void fijarAljibe((e.currentTarget as HTMLInputElement).checked);
+              }}
+            />
+            <span>{demo.aljibe}</span>
+          </label>
         </div>
         <p
           class="barra-demo__aviso"

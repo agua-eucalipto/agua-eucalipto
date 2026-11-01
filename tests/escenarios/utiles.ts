@@ -28,6 +28,11 @@ export function tel(n: number): string {
   return `116245${String(n).padStart(3, "0")}`;
 }
 
+/** Folio del Ayuntamiento: exactamente 4 dígitos. */
+export function ay(n: number): string {
+  return String(n).padStart(4, "0");
+}
+
 // ---------------------------------------------------------------------------
 // Resultados
 // ---------------------------------------------------------------------------

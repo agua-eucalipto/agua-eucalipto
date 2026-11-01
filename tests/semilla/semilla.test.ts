@@ -55,7 +55,7 @@ async function adelantar(api: ApiMemoria, horas: number) {
 
 async function verificarT0(api: ApiMemoria) {
   const f7 = await foliosDe(api, "7");
-  expect(f7.size).toBe(5);
+  expect(f7.size).toBe(7);
   const hoy = f7.get("SIAPAZAP20261001");
   expect(hoy).toMatchObject({ estado: "activo", vence_hoy: true });
   expect(hoy?.vence_at).toBe(ahora() + 22 * HORA_MS);
@@ -72,6 +72,17 @@ async function verificarT0(api: ApiMemoria) {
   expect(f7.get("SIAPAZAP20260900")?.estado).toBe("surtido");
   expect(f7.get("116244000")).toMatchObject({ estado: "reemplazado" });
   expect(f7.get("116244000")?.cerrado_at).toBe(ahora() - 26 * HORA_MS);
+  expect(f7.get("2402")).toMatchObject({
+    canal: "ayuntamiento",
+    estado: "vencido",
+    puede_extender: true,
+  });
+  expect(f7.get("2401")).toMatchObject({
+    canal: "ayuntamiento",
+    estado: "surtido",
+  });
+  expect(f7.get("2401")?.ultimo_envio_caseta_at).toBeNull();
+  expect(f7.get("2402")?.ultimo_envio_caseta_at).toBe(ahora() - 20 * HORA_MS);
 
   const f3 = await foliosDe(api, "3");
   expect(f3.get("116245010")).toMatchObject({
@@ -370,6 +381,6 @@ describe("semilla", () => {
       setItem: () => undefined,
     };
     const api = await crearApiDemo({ almacenamiento });
-    expect((await foliosDe(api, "7")).size).toBe(5);
+    expect((await foliosDe(api, "7")).size).toBe(7);
   });
 });

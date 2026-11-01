@@ -34,6 +34,12 @@ test("el guion de presentación se completa sin estados de error", async ({
     await irA(page, "Información");
     await expect(page.getByText("Un pizarrón compartido")).toBeVisible();
     await expect(
+      page.getByRole("link", { name: /WhatsApp del Gobierno de Zapopan/ }),
+    ).toHaveAttribute("href", "https://wa.me/523338182222");
+    await expect(
+      page.getByRole("link", { name: /Teléfono del SIAPA/ }),
+    ).toHaveAttribute("href", "tel:+523336682482");
+    await expect(
       page.getByText(
         "otras calles pueden usarlo con sus propios coordinadores.",
       ),
@@ -54,6 +60,11 @@ test("el guion de presentación se completa sin estados de error", async ({
 
     await page.getByRole("button", { name: "Registrar folio" }).click();
     const alta = page.getByRole("dialog", { name: "Registrar folio" });
+    await alta.getByLabel("Folio").fill("2403");
+    await expect(alta.getByText("Ayuntamiento de Zapopan")).toBeVisible();
+    await expect(
+      alta.getByRole("link", { name: /WhatsApp del SIAPA/ }),
+    ).toHaveAttribute("href", "https://wa.me/523351644440");
     await alta.getByLabel("Folio").fill(TEL);
     await alta.getByRole("button", { name: "Registrar", exact: true }).click();
     await expect(
@@ -119,7 +130,10 @@ test("el guion de presentación se completa sin estados de error", async ({
     await expect(
       page.getByText("Listo, quitamos el folio de la lista."),
     ).toBeVisible();
-    await expect(page.getByText("No tienes folios activos.")).toBeVisible();
+    await expect(page.getByText("No tienes folios activos.")).toHaveCount(0);
+    await expect(
+      page.getByRole("article", { name: "Folio 2402" }),
+    ).toContainText("Venció");
     await sinErrorGenerico(page);
   });
 

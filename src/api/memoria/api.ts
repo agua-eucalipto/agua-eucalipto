@@ -1,4 +1,4 @@
-import { HORA_MS } from "../../dominio";
+import { HORA_MS, esNivelAljibe } from "../../dominio";
 import {
   adelantar as adelantarReloj,
   ahora,
@@ -9,13 +9,22 @@ import type {
   ApiDemo,
   CambiosViaje,
   DatosAbrirViaje,
+  FotoAljibe,
   MotivoSolicitud,
+  NivelAljibe,
   OpcionesListaCaseta,
   PerfilDemo,
   Resultado,
   ResultadoEntrega,
 } from "../contrato";
 import * as acceso from "./acceso";
+import {
+  fijarAljibe,
+  guardarReporte,
+  listarAljibes,
+  miReporte,
+  prepararEvidencia,
+} from "./aljibe";
 import { barrer } from "./barrido";
 import { bitacora } from "./bitacora";
 import { generarListaCaseta } from "./caseta";
@@ -59,6 +68,8 @@ export interface OpcionesApiMemoria {
 export class ApiMemoria implements Api, ApiDemo {
   #estado: EstadoDemo;
   #almacen: Almacen | null;
+  /** Data URLs de las fotos. No se escriben en el almacenamiento. */
+  #fotos = new Map<string, string>();
   readonly #catalogo: Catalogo;
   readonly #semilla: OpcionesApiMemoria["semilla"];
 
@@ -121,6 +132,48 @@ export class ApiMemoria implements Api, ApiDemo {
     return this.#escribir((tx) =>
       folios.marcarSurtido(tx, folio_id, quemar_otros),
     );
+  }
+
+  marcar_sin_surtir(folio_id: string) {
+    return this.#escribir((tx) => folios.marcarSinSurtir(tx, folio_id));
+  }
+
+  // Aljibe
+
+  async mi_reporte_aljibe() {
+    const r = await this.#leer((tx) => miReporte(tx));
+    if (!r.ok) return r;
+    if (r.datos === null) return exito(null);
+    return exito({
+      ...r.datos,
+      foto_url: this.#fotos.get(r.datos.id) ?? null,
+    });
+  }
+
+  async reportar_nivel_aljibe(nivel: NivelAljibe, foto?: FotoAljibe | null) {
+    if (!esNivelAljibe(nivel)) return falla("DATOS_INVALIDOS");
+    if (
+      foto != null &&
+      (!(foto.bytes instanceof Uint8Array) || typeof foto.tipo !== "string")
+    ) {
+      return falla("DATOS_INVALIDOS");
+    }
+    const evidencia =
+      foto != null && foto.bytes.byteLength > 0
+        ? await prepararEvidencia(foto)
+        : null;
+    const r = await this.#escribir((tx) =>
+      guardarReporte(tx, nivel, evidencia),
+    );
+    if (!r.ok) return r;
+    if (r.datos.anteriorId !== null) this.#fotos.delete(r.datos.anteriorId);
+    const fotoUrl = evidencia?.fotoUrl ?? null;
+    if (fotoUrl !== null) this.#fotos.set(r.datos.reporte.id, fotoUrl);
+    return exito({ ...r.datos.reporte, foto_url: fotoUrl });
+  }
+
+  listar_aljibes() {
+    return this.#leer((tx) => listarAljibes(tx));
   }
 
   // Pipas
@@ -232,10 +285,19 @@ export class ApiMemoria implements Api, ApiDemo {
 
   async demo_reiniciar(): Promise<Resultado<void>> {
     reiniciarReloj();
+    this.#fotos.clear();
     this.#estado = crearEstadoInicial(this.#catalogo, ahora());
     this.#guardar();
     await this.#semilla?.(this);
     return exito(undefined);
+  }
+
+  demo_mostrar_aljibe() {
+    return this.#leer((tx) => exito(tx.estado.mostrar_aljibe === true));
+  }
+
+  demo_fijar_aljibe(activo: boolean) {
+    return this.#escribir((tx) => fijarAljibe(tx, activo));
   }
 
   // Ejecución

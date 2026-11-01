@@ -40,6 +40,7 @@ export const comun = {
     casa: "Casa",
     adelantar: "Adelantar 1 día",
     reiniciar: "Reiniciar",
+    aljibe: "Mostrar nivel del aljibe (prueba)",
     confirmarReinicio: "Se borran los cambios y vuelven los datos de ejemplo.",
     tituloReiniciar: "¿Reiniciar el demo?",
     siReiniciar: "Sí, reiniciar",
@@ -57,5 +58,26 @@ export const comun = {
   noAutorizado: "Esta opción es solo para el equipo de coordinación.",
   estados: {
     cargando: "Cargando…",
+  },
+  contactos: {
+    titulo: "Contactos oficiales",
+    ayuda: "Si necesitas reportar, puedes llamar o escribir aquí.",
+    enlaces: [
+      {
+        nombre: "WhatsApp del Gobierno de Zapopan",
+        numero: "+52 33 3818 2222",
+        href: "https://wa.me/523338182222",
+      },
+      {
+        nombre: "Teléfono del SIAPA",
+        numero: "33 3668 2482",
+        href: "tel:+523336682482",
+      },
+      {
+        nombre: "WhatsApp del SIAPA",
+        numero: "+52 33 5164 4440",
+        href: "https://wa.me/523351644440",
+      },
+    ],
   },
 } as const;

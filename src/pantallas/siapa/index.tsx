@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import type { FolioVista } from "../../api";
+import type { Canal, FolioVista } from "../../api";
 import {
   Aviso,
   Boton,
@@ -7,18 +7,25 @@ import {
   TarjetaFolio,
   type NombreIcono,
 } from "../../componentes";
-import { TOPE_FOLIOS_POR_CANAL } from "../../dominio";
-import { api, reloj, sesion } from "../../app/servicios";
+import { TOPE_FOLIOS_POR_CASA } from "../../dominio";
+import { api, mostrarAljibe, reloj, sesion } from "../../app/servicios";
 import { fechaCorta } from "../../app/formato";
 import { resumenTitulo } from "../../app/titulo";
 import { comun, siapa } from "../../textos";
-import { DialogoPendiente, DialogoRegistro, DialogoSurtido } from "./Dialogos";
+import {
+  DialogoPendiente,
+  DialogoRegistro,
+  DialogoSinSurtir,
+  DialogoSurtido,
+} from "./Dialogos";
+import { NivelAljibe } from "./NivelAljibe";
 import { esHistorial, insigniaDe, porVencimiento } from "./util";
 
 type Abierto =
   | { t: "registrar" }
   | { t: "reemplazar"; folio: FolioVista }
   | { t: "surtido"; folio: FolioVista }
+  | { t: "sin-surtir"; folio: FolioVista }
   | { t: "pendiente"; folio: FolioVista }
   | null;
 
@@ -28,7 +35,14 @@ const TEXTO_INSIGNIA = {
   vencio: siapa.insignia.vencio,
   surtido: siapa.insignia.surtido,
   reemplazado: siapa.insignia.reemplazado,
+  cerrado: siapa.insignia.cerradoSinSurtir,
 } as Record<string, string>;
+
+function iconoCanal(canal: Canal): NombreIcono {
+  if (canal === "whatsapp") return "chat";
+  if (canal === "telefono") return "telefono";
+  return "casa";
+}
 
 function Tarjeta({
   f,
@@ -41,13 +55,15 @@ function Tarjeta({
 }) {
   const historial = esHistorial(f);
   const estado = insigniaDe(f);
-  const icono: NombreIcono = f.canal === "whatsapp" ? "chat" : "telefono";
+  const icono = iconoCanal(f.canal);
 
   let tiempo = siapa.lleva(f.dias_que_lleva);
   if (f.estado === "surtido" && f.cerrado_at !== null) {
     tiempo = siapa.surtidoEl(fechaCorta(f.cerrado_at));
   } else if (f.estado === "reemplazado" && f.cerrado_at !== null) {
     tiempo = siapa.reemplazadoEl(fechaCorta(f.cerrado_at));
+  } else if (f.estado === "cerrado_sin_surtir" && f.cerrado_at !== null) {
+    tiempo = siapa.cerradoEl(fechaCorta(f.cerrado_at));
   }
 
   const notas: { icono?: NombreIcono; texto: string }[] = [];
@@ -79,6 +95,14 @@ function Tarjeta({
       >
         {siapa.acciones.surtieron}
       </Boton>
+      {f.estado === "vencido" ? (
+        <Boton
+          onClick={() => abrir({ t: "sin-surtir", folio: f })}
+          aria-label={`${siapa.acciones.sinSurtir}, folio ${f.codigo}`}
+        >
+          {siapa.acciones.sinSurtir}
+        </Boton>
+      ) : null}
       {f.puede_extender ? (
         <Boton
           onClick={() => abrir({ t: "pendiente", folio: f })}
@@ -133,6 +157,7 @@ export function PantallaSiapa() {
   // de sesión se vuelve a pedir la lista sin recargar la página.
   const ahora = reloj.value;
   const { casa, rol } = sesion.value;
+  const aljibeVisible = mostrarAljibe.value && casa !== null;
   const clave = `${casa ?? ""}|${rol}`;
   const folios = !falla && leidos?.clave === clave ? leidos.folios : null;
 
@@ -182,7 +207,7 @@ export function PantallaSiapa() {
   const activosCuenta = lista.filter((f) => f.estado === "activo").length;
   const resumen =
     casa !== null && folios !== null
-      ? siapa.resumen(casa, activosCuenta, TOPE_FOLIOS_POR_CANAL * 2)
+      ? siapa.resumen(casa, activosCuenta, TOPE_FOLIOS_POR_CASA)
       : "";
   useEffect(() => {
     resumenTitulo.value = resumen;
@@ -198,6 +223,7 @@ export function PantallaSiapa() {
 
   return (
     <>
+      {aljibeVisible ? <NivelAljibe key={casa ?? ""} /> : null}
       <Boton
         variante="primario"
         ancho
@@ -283,6 +309,13 @@ export function PantallaSiapa() {
               (f) => f.estado === "activo" && f.id !== abierto.folio.id,
             ).length
           }
+          onCerrar={cerrar}
+          onHecho={hecho}
+        />
+      ) : null}
+      {abierto?.t === "sin-surtir" ? (
+        <DialogoSinSurtir
+          folio={abierto.folio}
           onCerrar={cerrar}
           onHecho={hecho}
         />

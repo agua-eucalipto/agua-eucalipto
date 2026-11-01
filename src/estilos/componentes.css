@@ -36,6 +36,30 @@
   margin-left: auto;
   align-items: center;
 }
+.barra-demo__fila {
+  display: contents;
+}
+.barra-demo__aljibe {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  min-width: 48px;
+  min-height: var(--toque-min);
+  max-width: 100%;
+  font-size: var(--t-chico);
+  font-weight: var(--peso-fuerte);
+  cursor: pointer;
+}
+.barra-demo__aljibe span {
+  min-width: 0;
+}
+.barra-demo__aljibe input {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  flex: none;
+  accent-color: var(--demo-tinta);
+}
 .barra-demo__plegada {
   margin-left: auto;
 }
@@ -173,6 +197,20 @@
 }
 .btn--ancho {
   width: 100%;
+}
+.btn--contacto {
+  flex-wrap: wrap;
+  height: auto;
+}
+.contactos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+}
+.contactos__titulo {
+  font-size: var(--t-titulo-3);
+  line-height: var(--interlinea-titulo);
+  font-weight: var(--peso-fuerte);
 }
 .btn[aria-disabled="true"],
 .btn:disabled {
@@ -540,6 +578,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--e-4);
+  max-height: 100dvh;
+  overflow: auto;
   animation: hoja-sube var(--dur-media) var(--curva-salida);
 }
 @keyframes hoja-sube {
@@ -648,6 +688,13 @@
 @media (min-width: 960px) {
   .barra-demo__controles {
     display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .barra-demo__fila {
+    display: flex;
+    align-items: center;
+    gap: var(--e-2);
   }
   .barra-demo__plegada {
     display: none;
@@ -769,8 +816,10 @@
     overflow-y: auto;
     overscroll-behavior: contain;
   }
-  .barra-demo--abierta .barra-demo__ver-como {
+  .barra-demo--abierta .barra-demo__ver-como,
+  .barra-demo--abierta .barra-demo__aljibe {
     grid-column: 1 / -1;
+    min-width: 0;
   }
   .barra-demo--abierta .barra-demo__controles .btn-demo {
     justify-content: center;

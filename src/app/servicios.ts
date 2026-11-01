@@ -15,11 +15,17 @@ export async function iniciarApi(): Promise<void> {
   api = instancia;
   apiDemo = instancia;
   reloj.value = ahora();
+  await sincronizarAljibe();
 }
 
 export const sesion = signal<Sesion>({ casa: null, rol: "sin_sesion" });
 /** Milisegundos del reloj simulado; cambia al adelantar o reiniciar. */
 export const reloj = signal<number>(ahora());
+/**
+ * Casilla «Mostrar nivel del aljibe». Apagada al empezar y al reiniciar.
+ * Se recuerda en el estado guardado del demo.
+ */
+export const mostrarAljibe = signal(false);
 
 export const DIA_MS = 24 * 60 * 60 * 1000;
 
@@ -63,7 +69,19 @@ export async function adelantarUnDia() {
 export async function reiniciarDemo() {
   const r = await apiDemo.demo_reiniciar();
   if (r.ok) {
+    mostrarAljibe.value = false;
     await arrancarSesionDemo();
   }
   return r;
+}
+
+export async function fijarAljibe(activo: boolean) {
+  const r = await apiDemo.demo_fijar_aljibe(activo);
+  if (r.ok) mostrarAljibe.value = r.datos;
+  return r;
+}
+
+async function sincronizarAljibe(): Promise<void> {
+  const r = await apiDemo.demo_mostrar_aljibe();
+  mostrarAljibe.value = r.ok ? r.datos : false;
 }
