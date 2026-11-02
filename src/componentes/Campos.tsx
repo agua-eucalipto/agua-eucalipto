@@ -18,7 +18,7 @@ export function CampoGrande({
 }: {
   id: string;
   etiqueta: string;
-  ayuda?: string;
+  ayuda?: string | readonly string[];
   valor: string;
   onInput: (valor: string) => void;
   error?: string;
@@ -39,9 +39,17 @@ export function CampoGrande({
         {etiqueta}
       </label>
       {ayuda ? (
-        <p class="campo__ayuda" id={`${id}-ayuda`}>
-          {ayuda}
-        </p>
+        Array.isArray(ayuda) ? (
+          <ul class="campo__ayuda campo__ayuda--lista" id={`${id}-ayuda`}>
+            {ayuda.map((linea) => (
+              <li key={linea}>{linea}</li>
+            ))}
+          </ul>
+        ) : (
+          <p class="campo__ayuda" id={`${id}-ayuda`}>
+            {ayuda}
+          </p>
+        )
       ) : null}
       <input
         class="campo__entrada"

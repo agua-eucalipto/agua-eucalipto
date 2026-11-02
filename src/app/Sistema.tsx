@@ -1,4 +1,5 @@
 import { useState } from "preact/hooks";
+import { siapa } from "../textos";
 import {
   Aviso,
   AvanceViaje,
@@ -111,7 +112,7 @@ export default function Sistema() {
         <CampoGrande
           id="c-ok"
           etiqueta="Número de folio"
-          ayuda="Empieza con SIAPAZAP (WhatsApp) o con 1162 (teléfono)."
+          ayuda={siapa.registro.ayuda}
           valor={texto}
           onInput={setTexto}
           confirmacion="WhatsApp"

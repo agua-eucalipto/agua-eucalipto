@@ -16,7 +16,7 @@ import {
   queHizo,
   quien,
 } from "../../../src/pantallas/info/bitacora-texto";
-import { info } from "../../../src/textos";
+import { comun, info } from "../../../src/textos";
 import { api, datosSensibles, prepararDemo, verComo } from "./ayudas";
 
 const t = info;
@@ -89,18 +89,84 @@ describe("Información", () => {
     }
   });
 
-  it("los contactos oficiales enlazan WhatsApp y teléfono", () => {
+  it("los contactos son enlaces de texto y el teléfono del SIAPA no ofrece WhatsApp", () => {
     render(<PantallaInfo />);
-    const whatsapp = screen.getByRole("link", {
-      name: /WhatsApp del Gobierno de Zapopan/,
+    const lineas = [
+      /WhatsApp del Gobierno de Zapopan/,
+      /Teléfono del SIAPA/,
+      /WhatsApp del SIAPA/,
+    ];
+    for (const nombre of lineas) {
+      const linea = screen.getByRole("button", { name: nombre });
+      expect(linea.className).toContain("enlace-contacto");
+      expect(linea.className).not.toMatch(/\bbtn\b/);
+    }
+
+    fireEvent.click(screen.getByRole("button", { name: /Teléfono del SIAPA/ }));
+    const dialogo = screen.getByRole("dialog", {
+      name: comun.contactos.introduccion("SIAPA"),
     });
-    const telefono = screen.getByRole("link", { name: /Teléfono del SIAPA/ });
-    const siapaWa = screen.getByRole("link", { name: /WhatsApp del SIAPA/ });
-    expect(whatsapp.getAttribute("href")).toBe("https://wa.me/523338182222");
-    expect(telefono.getAttribute("href")).toBe("tel:+523336682482");
-    expect(siapaWa.getAttribute("href")).toBe("https://wa.me/523351644440");
-    for (const enlace of [whatsapp, telefono, siapaWa]) {
-      expect(enlace.className).toContain("btn");
+    expect(dialogo.textContent).toContain(
+      comun.contactos.introduccion("SIAPA"),
+    );
+    expect(within(dialogo).getByText("Teléfono")).toBeTruthy();
+    expect(dialogo.textContent).toContain("33 3668 2482");
+    expect(
+      within(dialogo)
+        .getByRole("link", { name: "Llamar" })
+        .getAttribute("href"),
+    ).toBe("tel:+523336682482");
+    expect(
+      within(dialogo).queryByRole("link", { name: "Mandar mensaje" }),
+    ).toBeNull();
+    fireEvent.click(within(dialogo).getByRole("button", { name: "Cancelar" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("los contactos de WhatsApp ofrecen llamar y mandar mensaje", () => {
+    render(<PantallaInfo />);
+    const casos = [
+      {
+        nombre: /WhatsApp del Gobierno de Zapopan/,
+        entidad: "Gobierno de Zapopan",
+        canal: "WhatsApp",
+        tel: "tel:+523338182222",
+        whatsapp: "https://wa.me/523338182222",
+        numero: "+52 33 3818 2222",
+      },
+      {
+        nombre: /WhatsApp del SIAPA/,
+        entidad: "SIAPA",
+        canal: "WhatsApp",
+        tel: "tel:+523351644440",
+        whatsapp: "https://wa.me/523351644440",
+        numero: "+52 33 5164 4440",
+      },
+    ];
+    for (const caso of casos) {
+      fireEvent.click(screen.getByRole("button", { name: caso.nombre }));
+      const dialogo = screen.getByRole("dialog", {
+        name: comun.contactos.introduccion(caso.entidad),
+      });
+      expect(dialogo.textContent).toContain(
+        comun.contactos.introduccion(caso.entidad),
+      );
+      expect(within(dialogo).getByText(caso.canal)).toBeTruthy();
+      expect(dialogo.textContent).toContain(caso.numero);
+      expect(
+        within(dialogo)
+          .getByRole("link", { name: "Llamar" })
+          .getAttribute("href"),
+      ).toBe(caso.tel);
+      expect(
+        within(dialogo)
+          .getByRole("link", { name: "Mandar mensaje" })
+          .getAttribute("href"),
+      ).toBe(caso.whatsapp);
+      fireEvent.click(
+        within(dialogo).getByRole("button", { name: "Cancelar" }),
+      );
+      expect(screen.queryByRole("dialog")).toBeNull();
     }
   });
 });

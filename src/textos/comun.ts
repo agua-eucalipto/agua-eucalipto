@@ -61,22 +61,35 @@ export const comun = {
   },
   contactos: {
     titulo: "Contactos oficiales",
-    ayuda: "Si necesitas reportar, puedes llamar o escribir aquí.",
-    enlaces: [
+    introduccion: (entidad: string) =>
+      `Este es el número registrado de contacto del ${entidad}:`,
+    llamar: "Llamar",
+    mensaje: "Mandar mensaje",
+    cancelar: "Cancelar",
+    lista: [
       {
         nombre: "WhatsApp del Gobierno de Zapopan",
+        entidad: "Gobierno de Zapopan",
+        canal: "WhatsApp",
         numero: "+52 33 3818 2222",
-        href: "https://wa.me/523338182222",
+        tel: "tel:+523338182222",
+        whatsapp: "https://wa.me/523338182222",
       },
       {
         nombre: "Teléfono del SIAPA",
+        entidad: "SIAPA",
+        canal: "Teléfono",
         numero: "33 3668 2482",
-        href: "tel:+523336682482",
+        tel: "tel:+523336682482",
+        whatsapp: null,
       },
       {
         nombre: "WhatsApp del SIAPA",
+        entidad: "SIAPA",
+        canal: "WhatsApp",
         numero: "+52 33 5164 4440",
-        href: "https://wa.me/523351644440",
+        tel: "tel:+523351644440",
+        whatsapp: "https://wa.me/523351644440",
       },
     ],
   },

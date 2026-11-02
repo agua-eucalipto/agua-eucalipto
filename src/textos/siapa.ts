@@ -50,8 +50,11 @@ export const siapa = {
   registro: {
     titulo: "Registrar folio",
     etiqueta: "Folio",
-    ayuda:
-      "SIAPAZAP es WhatsApp del SIAPA. 1162 es teléfono. 4 dígitos, Ayuntamiento.",
+    ayuda: [
+      "WhatsApp del SIAPA: empieza con SIAPAZAP.",
+      "Teléfono del SIAPA: empieza con 1162.",
+      "Ayuntamiento de Zapopan: 4 números.",
+    ],
     /** El campo agrega la palomita. */
     canalDetectado: (canal: Canal) => NOMBRE_CANAL[canal],
     confirmar: "Registrar",

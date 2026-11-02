@@ -338,11 +338,77 @@ describe("registro desde una casa sin folios (casa 10)", () => {
     expect(document.querySelector(".campo__ok")?.textContent).toContain(
       siapa.registro.canalDetectado("ayuntamiento"),
     );
+    const registro = screen.getByRole("dialog", {
+      name: siapa.registro.titulo,
+    });
+    for (const linea of siapa.registro.ayuda) {
+      expect(within(registro).getByText(linea)).toBeTruthy();
+    }
+    const campo = screen.getByLabelText(
+      siapa.registro.etiqueta,
+    ) as HTMLInputElement;
+    expect(campo.value).toBe("2408");
+    const contacto = within(registro).getByRole("button", {
+      name: /WhatsApp del Gobierno de Zapopan/,
+    });
+    expect(contacto.className).toContain("enlace-contacto");
+    expect(contacto.className).not.toMatch(/\bbtn\b/);
+    contacto.focus();
+    fireEvent.click(contacto);
+    const aviso = screen.getByRole("dialog", {
+      name: comun.contactos.introduccion("Gobierno de Zapopan"),
+    });
+    expect(registro.parentElement?.hasAttribute("inert")).toBe(true);
+    expect(registro.parentElement?.getAttribute("aria-hidden")).toBe("true");
+    expect(campo.value).toBe("2408");
+    expect(within(aviso).getByText("WhatsApp")).toBeTruthy();
     expect(
-      within(screen.getByRole("dialog")).getByRole("link", {
-        name: /WhatsApp del Gobierno de Zapopan/,
+      within(aviso).getByRole("link", { name: comun.contactos.llamar }),
+    ).toHaveProperty("href", "tel:+523338182222");
+    expect(
+      within(aviso).getByRole("link", { name: comun.contactos.mensaje }),
+    ).toHaveProperty("href", "https://wa.me/523338182222");
+    fireEvent.click(
+      within(aviso).getByRole("button", { name: comun.contactos.cancelar }),
+    );
+    expect(campo.value).toBe("2408");
+    expect(document.activeElement).toBe(contacto);
+    expect(registro.parentElement?.hasAttribute("inert")).toBe(false);
+    const telefonoBoton = within(registro).getByRole("button", {
+      name: /Teléfono del SIAPA/,
+    });
+    telefonoBoton.focus();
+    fireEvent.click(telefonoBoton);
+    const telefono = screen.getByRole("dialog", {
+      name: comun.contactos.introduccion("SIAPA"),
+    });
+    expect(registro.parentElement?.hasAttribute("inert")).toBe(true);
+    expect(within(telefono).getByText("Teléfono")).toBeTruthy();
+    expect(
+      within(telefono).getByRole("link", { name: comun.contactos.llamar }),
+    ).toHaveProperty("href", "tel:+523336682482");
+    expect(
+      within(telefono).queryByRole("link", { name: comun.contactos.mensaje }),
+    ).toBeNull();
+    expect(campo.value).toBe("2408");
+    fireEvent.click(
+      within(telefono).getByRole("button", { name: comun.contactos.cancelar }),
+    );
+    expect(campo.value).toBe("2408");
+    expect(document.activeElement).toBe(telefonoBoton);
+    expect(
+      screen.getByRole("dialog", { name: siapa.registro.titulo }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("dialog", {
+        name: comun.contactos.introduccion("Gobierno de Zapopan"),
       }),
-    ).toHaveProperty("href", expect.stringContaining("wa.me/523338182222"));
+    ).toBeNull();
+    expect(
+      screen.queryByRole("dialog", {
+        name: comun.contactos.introduccion("SIAPA"),
+      }),
+    ).toBeNull();
   });
 
   it("E-F02: formatos inválidos muestran el texto de la Api", async () => {
