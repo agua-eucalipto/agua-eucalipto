@@ -39,4 +39,53 @@ describe("Dialogo", () => {
     expect(app.hasAttribute("inert")).toBe(false);
     app.remove();
   });
+
+  it("un diálogo encima no cierra el de abajo ni borra lo escrito", () => {
+    const onCerrar = vi.fn();
+    const app = document.createElement("div");
+    app.id = "app";
+    document.body.appendChild(app);
+
+    function Anidados() {
+      const [encima, setEncima] = useState(false);
+      return (
+        <Dialogo titulo="Registrar folio" onCerrar={onCerrar}>
+          <input aria-label="Folio" value="2403" onInput={() => undefined} />
+          <Boton onClick={() => setEncima(true)}>Ver contacto</Boton>
+          {encima ? (
+            <Dialogo
+              titulo="Contacto del SIAPA"
+              onCerrar={() => setEncima(false)}
+            >
+              <Boton focoInicial onClick={() => setEncima(false)}>
+                Cancelar
+              </Boton>
+            </Dialogo>
+          ) : null}
+        </Dialogo>
+      );
+    }
+
+    const { unmount } = render(<Anidados />, { container: app });
+    fireEvent.click(screen.getByRole("button", { name: "Ver contacto" }));
+    expect(screen.getAllByRole("dialog")).toHaveLength(2);
+    expect(app.hasAttribute("inert")).toBe(true);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onCerrar).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole("dialog", { name: "Registrar folio" }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("dialog", { name: "Contacto del SIAPA" }),
+    ).toBeNull();
+    expect((screen.getByLabelText("Folio") as HTMLInputElement).value).toBe(
+      "2403",
+    );
+    expect(app.hasAttribute("inert")).toBe(true);
+
+    unmount();
+    expect(app.hasAttribute("inert")).toBe(false);
+    app.remove();
+  });
 });

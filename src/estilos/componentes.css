@@ -198,19 +198,58 @@
 .btn--ancho {
   width: 100%;
 }
-.btn--contacto {
-  flex-wrap: wrap;
-  height: auto;
-}
 .contactos {
   display: flex;
   flex-direction: column;
-  gap: var(--e-3);
+  gap: var(--e-2);
 }
-.contactos__titulo {
-  font-size: var(--t-titulo-3);
-  line-height: var(--interlinea-titulo);
+.contactos > .contactos__titulo {
+  font-size: var(--t-chico);
+  line-height: var(--interlinea);
   font-weight: var(--peso-fuerte);
+  color: var(--tinta-2);
+}
+.contactos__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-2);
+}
+.enlace-contacto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--e-2);
+  row-gap: var(--e-1);
+  width: 100%;
+  min-height: var(--toque-min);
+  margin: 0;
+  padding: var(--e-2) 0;
+  border: 0;
+  background: transparent;
+  color: var(--marca);
+  font: inherit;
+  font-size: var(--t-base);
+  font-weight: var(--peso-normal);
+  line-height: var(--interlinea);
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.enlace-contacto__numero {
+  font-variant-numeric: tabular-nums;
+}
+.contacto-numero {
+  margin: 0;
+  font-size: var(--t-titulo-1);
+  font-weight: var(--peso-fuerte);
+  line-height: var(--interlinea-titulo);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 .btn[aria-disabled="true"],
 .btn:disabled {
@@ -515,6 +554,14 @@
   font-size: var(--t-chico);
   color: var(--tinta-2);
 }
+.campo__ayuda--lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-1);
+}
 .campo__entrada {
   min-height: var(--toque-principal);
   padding: 0 var(--e-4);
@@ -581,6 +628,12 @@
   max-height: 100dvh;
   overflow: auto;
   animation: hoja-sube var(--dur-media) var(--curva-salida);
+}
+.dialogo__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+  min-width: 0;
 }
 @keyframes hoja-sube {
   from {
