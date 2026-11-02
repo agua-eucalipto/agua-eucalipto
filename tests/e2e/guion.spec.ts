@@ -40,8 +40,11 @@ test("el guion de presentación se completa sin estados de error", async ({
     expect((await zapopan.boundingBox())!.height).toBeGreaterThanOrEqual(48);
     await zapopan.click();
     const contactoZapopan = page.getByRole("dialog", {
-      name: /WhatsApp del Gobierno de Zapopan/,
+      name: "Este es el número registrado de contacto del Gobierno de Zapopan:",
     });
+    await expect(
+      contactoZapopan.getByText("WhatsApp", { exact: true }),
+    ).toBeVisible();
     await expect(
       contactoZapopan.getByRole("link", { name: "Llamar" }),
     ).toHaveAttribute("href", "tel:+523338182222");
@@ -55,8 +58,11 @@ test("el guion de presentación se completa sin estados de error", async ({
     });
     await telefonoSiapa.click();
     const contactoTelefono = page.getByRole("dialog", {
-      name: /Teléfono del SIAPA/,
+      name: "Este es el número registrado de contacto del SIAPA:",
     });
+    await expect(
+      contactoTelefono.getByText("Teléfono", { exact: true }),
+    ).toBeVisible();
     await expect(
       contactoTelefono.getByRole("link", { name: "Llamar" }),
     ).toHaveAttribute("href", "tel:+523336682482");
@@ -112,8 +118,11 @@ test("el guion de presentación se completa sin estados de error", async ({
     ).toBeVisible();
     await alta.getByRole("button", { name: /WhatsApp del SIAPA/ }).click();
     const contactoSiapa = page.getByRole("dialog", {
-      name: /WhatsApp del SIAPA/,
+      name: "Este es el número registrado de contacto del SIAPA:",
     });
+    await expect(
+      contactoSiapa.getByText("WhatsApp", { exact: true }),
+    ).toBeVisible();
     await expect(
       contactoSiapa.getByRole("link", { name: "Mandar mensaje" }),
     ).toHaveAttribute("href", "https://wa.me/523351644440");

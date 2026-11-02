@@ -52,8 +52,11 @@ function DialogoDeContacto({
   onCerrar: () => void;
 }) {
   return (
-    <Dialogo titulo={t.introduccion(contacto.nombre)} onCerrar={onCerrar}>
-      <p class="contacto-numero">{contacto.numero}</p>
+    <Dialogo titulo={t.introduccion(contacto.entidad)} onCerrar={onCerrar}>
+      <p class="contacto-numero">
+        <span class="contacto-canal">{contacto.canal}</span>
+        <span>{contacto.numero}</span>
+      </p>
       <a
         class="btn btn--primario btn--ancho"
         href={contacto.tel}

@@ -344,15 +344,24 @@ describe("registro desde una casa sin folios (casa 10)", () => {
     for (const linea of siapa.registro.ayuda) {
       expect(within(registro).getByText(linea)).toBeTruthy();
     }
+    const campo = screen.getByLabelText(
+      siapa.registro.etiqueta,
+    ) as HTMLInputElement;
+    expect(campo.value).toBe("2408");
     const contacto = within(registro).getByRole("button", {
       name: /WhatsApp del Gobierno de Zapopan/,
     });
     expect(contacto.className).toContain("enlace-contacto");
     expect(contacto.className).not.toMatch(/\bbtn\b/);
+    contacto.focus();
     fireEvent.click(contacto);
     const aviso = screen.getByRole("dialog", {
-      name: /WhatsApp del Gobierno de Zapopan/,
+      name: comun.contactos.introduccion("Gobierno de Zapopan"),
     });
+    expect(registro.parentElement?.hasAttribute("inert")).toBe(true);
+    expect(registro.parentElement?.getAttribute("aria-hidden")).toBe("true");
+    expect(campo.value).toBe("2408");
+    expect(within(aviso).getByText("WhatsApp")).toBeTruthy();
     expect(
       within(aviso).getByRole("link", { name: comun.contactos.llamar }),
     ).toHaveProperty("href", "tel:+523338182222");
@@ -362,31 +371,42 @@ describe("registro desde una casa sin folios (casa 10)", () => {
     fireEvent.click(
       within(aviso).getByRole("button", { name: comun.contactos.cancelar }),
     );
-    fireEvent.click(
-      within(
-        screen.getByRole("dialog", { name: siapa.registro.titulo }),
-      ).getByRole("button", { name: /Teléfono del SIAPA/ }),
-    );
-    const telefono = screen.getByRole("dialog", { name: /Teléfono del SIAPA/ });
+    expect(campo.value).toBe("2408");
+    expect(document.activeElement).toBe(contacto);
+    expect(registro.parentElement?.hasAttribute("inert")).toBe(false);
+    const telefonoBoton = within(registro).getByRole("button", {
+      name: /Teléfono del SIAPA/,
+    });
+    telefonoBoton.focus();
+    fireEvent.click(telefonoBoton);
+    const telefono = screen.getByRole("dialog", {
+      name: comun.contactos.introduccion("SIAPA"),
+    });
+    expect(registro.parentElement?.hasAttribute("inert")).toBe(true);
+    expect(within(telefono).getByText("Teléfono")).toBeTruthy();
     expect(
       within(telefono).getByRole("link", { name: comun.contactos.llamar }),
     ).toHaveProperty("href", "tel:+523336682482");
     expect(
       within(telefono).queryByRole("link", { name: comun.contactos.mensaje }),
     ).toBeNull();
+    expect(campo.value).toBe("2408");
     fireEvent.click(
       within(telefono).getByRole("button", { name: comun.contactos.cancelar }),
     );
-    expect(
-      (screen.getByLabelText(siapa.registro.etiqueta) as HTMLInputElement)
-        .value,
-    ).toBe("2408");
+    expect(campo.value).toBe("2408");
+    expect(document.activeElement).toBe(telefonoBoton);
     expect(
       screen.getByRole("dialog", { name: siapa.registro.titulo }),
     ).toBeTruthy();
     expect(
       screen.queryByRole("dialog", {
-        name: /WhatsApp del Gobierno de Zapopan/,
+        name: comun.contactos.introduccion("Gobierno de Zapopan"),
+      }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole("dialog", {
+        name: comun.contactos.introduccion("SIAPA"),
       }),
     ).toBeNull();
   });

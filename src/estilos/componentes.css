@@ -244,12 +244,21 @@
   font-variant-numeric: tabular-nums;
 }
 .contacto-numero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--e-3);
   margin: 0;
   font-size: var(--t-titulo-1);
   font-weight: var(--peso-fuerte);
   line-height: var(--interlinea-titulo);
   text-align: center;
   font-variant-numeric: tabular-nums;
+}
+.contacto-canal {
+  font-size: var(--t-medio);
+  font-weight: var(--peso-fuerte);
 }
 .btn[aria-disabled="true"],
 .btn:disabled {
